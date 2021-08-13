@@ -1,0 +1,34 @@
+---
+
+- name: Install openssl
+  package:
+    name: openssl
+  when: ca_manage_openssl | bool
+
+- name: Ensure CA directory exists
+  file:
+    path: "{{ ca_ca_dir }}"
+    owner: root
+    group: root
+    mode: 0700
+    state: directory
+
+- name: Place CA configuration file
+  template:
+    src: ca.conf.j2
+    dest: "{{ ca_ca_dir }}/ca.conf"
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Generate CA key
+  command: "openssl genrsa -out {{ ca_ca_dir }}/ca.key {{ ca_ca_keylength }}"
+  args:
+    creates: "{{ ca_ca_dir }}/ca.key"
+
+- name: Generate CA certificate
+  command: >
+    "openssl req -x509 -new -nodes -key {{ ca_ca_dir }}/ca.key -sha256 -days
+    3650 -out {{ ca_ca_dir }}/ca.crt -config {{ ca_ca_dir }}/ca.conf"
+  args:
+    creates: "{{ ca_ca_dir }}/ca.crt"
