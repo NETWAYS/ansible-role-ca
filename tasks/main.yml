@@ -23,6 +23,7 @@
   openssl_privatekey:
     path: "{{ ca_ca_dir }}/{{ ansible_hostname }}.key"
     passphrase: "{{ ca_keypassphrase }}"
+    cipher: aes-256-cbc
 
 - name: Create CSR
   openssl_csr:
