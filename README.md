@@ -7,3 +7,7 @@
 A simple role to create a CA to create certificates and deploy them to hosts.
 
 The intended use is to create certificates you can use for connecting clients to main systems.
+
+## Variables ##
+
+* `ca_ca_days`: Runtime of the CA certificate (default: `3650`)
