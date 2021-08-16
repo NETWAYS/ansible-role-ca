@@ -37,7 +37,7 @@
     -nodes
     -key {{ ca_ca_dir }}/ca.key
     -sha256
-    -days 3650
+    -days {{ ca_ca_days }}
     -out {{ ca_ca_dir }}/ca.crt
     -config {{ ca_ca_dir }}/ca.conf
   args:
