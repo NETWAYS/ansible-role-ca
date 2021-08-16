@@ -10,4 +10,21 @@ The intended use is to create certificates you can use for connecting clients to
 
 ## Variables ##
 
+* `ca_ca`: Is this host the CA host? (default: `false`)
+* `ca_manage_openssl`: Install `openssl` package? (default: `true`)
+* `ca_ca_dir`: Directory to place CA and certificates (default: `/opt/ca`)
 * `ca_ca_days`: Runtime of the CA certificate (default: `3650`)
+* `ca_ca_password`: Password of CA key (default: `ChangeMe`)
+* `ca_localdir`: Temporary directory on Ansible management host (default: `/tmp/ca`)
+* `ca_ca_host`: Hostname of the CA host (default: `localhost`)
+* `ca_country`: Setting for certificates (default: `EX`)
+* `ca_state`: Setting for certificates (default: `EX`)
+* `ca_locality`: Setting for certificates (default: `EX`)
+* `ca_postalcode`: Setting for certificates (default: `1234`)
+* `ca_organization`: Setting for certificates (default: `example`)
+* `ca_organizationalunit`: Setting for certificates (default: `example`)
+* `ca_common_name`: CN for certificates (default: `{{ ansible_hostname }}`)
+* `ca_email`: E-Mail address for certificates (default: `root@{{ ansible_fqdn }}`)
+* `ca_altname_1`: First alt name (default: `{{ ansible_fqdn }}`)
+* `ca_ca_keylength`: CA keylength (default: `2048`)
+
