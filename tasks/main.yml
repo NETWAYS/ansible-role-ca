@@ -1,5 +1,89 @@
 ---
 
+- name: Ensure CA directory exists
+  file:
+    path: "{{ ca_ca_dir }}"
+    owner: root
+    group: root
+    mode: 0700
+    state: directory
+
+- name: Ensure local directory on Ansible host exists
+  file:
+    path: "{{ ca_localdir }}"
+    state: directory
+    mode: 0700
+  delegate_to: localhost
+
 - name: Set up ca
   import_tasks: ca.yml
   when: ca_ca | bool
+
+- name: Create key
+  openssl_privatekey:
+    path: "{{ ca_ca_dir }}/{{ ansible_hostname }}.key"
+
+- name: Create CSR
+  openssl_csr:
+    path: "{{ ca_ca_dir }}/{{ ansible_hostname }}.csr"
+    privatekey_path: "{{ ca_ca_dir }}/{{ ansible_hostname }}.key"
+    country_name: "{{ ca_country }}"
+    organization_name: "{{ ca_organization }}"
+    common_name: "{{ ansible_hostname }}"
+    subject_alt_name: "DNS:{{ ca_altname_1 }},DNS:{{ ansible_fqdn }}"
+    #subject_alt_name: "DNS:{{ ca_altname_1 }}"
+
+- name: Pull CSR
+  fetch:
+    src: "{{ ca_ca_dir }}/{{ ansible_hostname }}.csr"
+    dest: "{{ ca_localdir }}/{{ ansible_hostname }}.csr"
+    flat: true
+
+- name: Push CSR to CA host
+  copy:
+    src: "{{ ca_localdir }}/{{ ansible_hostname }}.csr"
+    dest: "{{ ca_ca_dir }}/{{ ansible_hostname }}.csr"
+    owner: root
+    group: root
+    mode: 0600
+  delegate_to: "{{ ca_ca_host }}"
+
+- name: Sign CSR with CA key
+  openssl_certificate:
+    path: "{{ ca_ca_dir }}/{{ ansible_hostname }}.crt"
+    csr_path: "{{ ca_ca_dir }}/{{ ansible_hostname }}.csr"
+    ownca_path: "{{ ca_ca_dir }}/ca.crt"
+    ownca_privatekey_path: "{{ ca_ca_dir }}/ca.key"
+    ownca_privatekey_passphrase: "{{ ca_ca_password }}"
+    provider: ownca
+  delegate_to: "{{ ca_ca_host }}"
+
+- name: Fetch certificate
+  fetch:
+    src: "{{ ca_ca_dir }}/{{ ansible_hostname }}.crt"
+    dest: "{{ ca_localdir }}/{{ ansible_hostname }}.crt"
+    flat: true
+  delegate_to: "{{ ca_ca_host }}"
+
+- name: Push certificate to client
+  copy:
+    src: "{{ ca_localdir }}/{{ ansible_hostname }}.crt"
+    dest: "{{ ca_ca_dir }}/{{ ansible_hostname }}.crt"
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Fetch CA certificate
+  fetch:
+    src: "{{ ca_ca_dir }}/ca.crt"
+    dest: "{{ ca_localdir }}/ca.crt"
+    flat: true
+  delegate_to: "{{ ca_ca_host }}"
+
+- name: Push CA certificate to client
+  copy:
+    src: "{{ ca_localdir }}/ca.crt"
+    dest: "{{ ca_ca_dir }}/ca.crt"
+    owner: root
+    group: root
+    mode: 0600

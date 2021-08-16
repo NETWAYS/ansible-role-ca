@@ -5,14 +5,6 @@
     name: openssl
   when: ca_manage_openssl | bool
 
-- name: Ensure CA directory exists
-  file:
-    path: "{{ ca_ca_dir }}"
-    owner: root
-    group: root
-    mode: 0700
-    state: directory
-
 - name: Place CA configuration file
   template:
     src: ca.conf.j2
