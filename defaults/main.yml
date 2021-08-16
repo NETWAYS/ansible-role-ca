@@ -17,3 +17,5 @@ ca_common_name: "{{ ansible_hostname }}"
 ca_email: "root@{{ ansible_fqdn }}"
 ca_altname_1: "{{ ansible_fqdn }}"
 ca_ca_keylength: 2048
+
+ca_keypassphrase: ChangeMeAgain
