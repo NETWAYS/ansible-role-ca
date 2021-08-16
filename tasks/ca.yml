@@ -1,10 +1,5 @@
 ---
 
-- name: Install openssl
-  package:
-    name: openssl
-  when: ca_manage_openssl | bool
-
 - name: Place CA configuration file
   template:
     src: ca.conf.j2
