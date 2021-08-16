@@ -152,4 +152,4 @@
       group: root
       mode: 0600
 
-  when: ca_server_cert || bool
+  when: ca_server_cert | bool
