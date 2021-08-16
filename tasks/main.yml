@@ -15,6 +15,11 @@
     mode: 0700
   delegate_to: localhost
 
+- name: Install openssl
+  package:
+    name: openssl
+  when: ca_manage_openssl | bool
+
 - name: Set up ca
   import_tasks: ca.yml
   when: ca_ca_host == inventory_hostname
