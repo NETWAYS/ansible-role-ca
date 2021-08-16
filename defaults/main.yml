@@ -3,6 +3,7 @@
 ca_ca: false
 ca_manage_openssl: true
 ca_ca_dir: /opt/ca
+ca_ca_password: ChangeMe
 
 ca_country: EX
 ca_state: EX
