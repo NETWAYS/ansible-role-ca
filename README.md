@@ -30,6 +30,7 @@ Some files are copied to the host you're running Ansible on.
 * `ca_email`: E-Mail address for certificates (default: `root@{{ ansible_fqdn }}`)
 * `ca_altname_1`: First alt name (default: `{{ ansible_fqdn }}`)
 * `ca_ca_keylength`: CA keylength (default: `2048`)
+* `ca_keypassphrase`: Password for the client key (default: `ChangeMeAgain`)
 
 ## Example Playbook ##
 
@@ -43,7 +44,7 @@ GPLv3+
 Author Information
 ------------------
 
-This role was created in 2021 by Thomas Widhal <widhalmt@widhalm.or.at>
+This role was created in 2021 by Thomas Widhalm <widhalmt@widhalm.or.at>
 
 Some code used from:
 
