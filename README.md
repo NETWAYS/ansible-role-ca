@@ -8,6 +8,10 @@ A simple role to create a CA to create certificates and deploy them to hosts.
 
 The intended use is to create certificates you can use for connecting clients to main systems.
 
+The current version is only tested with CentOS 7. If you want to use other OS'es please note that the name of Molecule instance is hardcoded within `converge.yml`
+
+Some files are copied to the host you're running Ansible on.
+
 ## Variables ##
 
 * `ca_ca`: Is this host the CA host? (default: `false`)
@@ -28,3 +32,21 @@ The intended use is to create certificates you can use for connecting clients to
 * `ca_altname_1`: First alt name (default: `{{ ansible_fqdn }}`)
 * `ca_ca_keylength`: CA keylength (default: `2048`)
 
+## Example Playbook ##
+
+    - hosts: all
+      roles:
+        - ca
+## License ##
+
+GPLv3+
+
+Author Information
+------------------
+
+This role was created in 2021 by Thomas Widhal <widhalmt@widhalm.or.at>
+
+Some code used from:
+
+* https://benjaminknofe.com/blog/2018/07/08/logstash-authentication-with-ssl-certificates/
+* https://gquintana.github.io/2020/11/28/Build-your-own-CA-with-Ansible.html
