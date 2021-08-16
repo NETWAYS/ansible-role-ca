@@ -109,8 +109,8 @@
       organization_name: "{{ ca_organization }}"
       common_name: "{{ ansible_hostname }}"
       subject_alt_name: "DNS:{{ ca_altname_1 }},DNS:{{ ansible_fqdn }}"
-    extended_key_usage:
-      - serverAuth
+      extended_key_usage:
+        - serverAuth
 
   - name: Pull server CSR
     fetch:
