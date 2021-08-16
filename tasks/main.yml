@@ -17,7 +17,7 @@
 
 - name: Set up ca
   import_tasks: ca.yml
-  when: ca_ca | bool
+  when: ca_ca_host == inventory_hostname
 
 - name: Create key
   openssl_privatekey:
