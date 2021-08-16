@@ -1,0 +1,8 @@
+---
+
+- name: Verify signature on certificate
+  command: >
+    openssl verify
+    -verbose
+    -CAfile {{ ca_ca_dir }}/ca.crt
+    {{ ca_ca_dir }}/{{ ansible_hostname }}.crt
