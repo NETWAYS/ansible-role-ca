@@ -15,6 +15,7 @@ Some files are copied to the host you're running Ansible on.
 ## Variables ##
 
 * `ca_manage_openssl`: Install `openssl` package? (default: `true`)
+* `ca_manage_python`: Install Python libraries (default: `true`)
 * `ca_ca_dir`: Directory to place CA and certificates (default: `/opt/ca`)
 * `ca_ca_days`: Runtime of the CA certificate (default: `3650`)
 * `ca_ca_password`: Password of CA key (default: `ChangeMe`)

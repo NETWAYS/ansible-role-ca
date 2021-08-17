@@ -20,6 +20,13 @@
     name: openssl
   when: ca_manage_openssl | bool
 
+- name: Install Python libraries
+  package:
+    name:
+      - python-cryptography
+      - pyOpenSSL
+  when: ca_manage_python | bool
+
 - name: Set up ca
   import_tasks: ca.yml
   when: ca_ca_host == inventory_hostname

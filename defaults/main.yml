@@ -1,6 +1,7 @@
 ---
 
 ca_manage_openssl: true
+ca_manage_python: true
 ca_ca_dir: /opt/ca
 ca_ca_days: 3650
 ca_ca_password: ChangeMe
