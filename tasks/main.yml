@@ -23,7 +23,7 @@
 - name: Install Python libraries
   package:
     name:
-      - python-cryptography
+      - python2-cryptography
       - pyOpenSSL
   when: ca_manage_python | bool
 
