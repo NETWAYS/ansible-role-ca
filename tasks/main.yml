@@ -29,11 +29,14 @@
 - name: Create key
   openssl_privatekey:
     path: "{{ ca_ca_dir }}/{{ ansible_hostname }}.key"
+    passphrase: "{{ ca_keypassphrase }}"
+    cipher: auto
 
 - name: Create CSR
   openssl_csr:
     path: "{{ ca_ca_dir }}/{{ ansible_hostname }}.csr"
     privatekey_path: "{{ ca_ca_dir }}/{{ ansible_hostname }}.key"
+    privatekey_passphrase: "{{ ca_keypassphrase }}"
     country_name: "{{ ca_country }}"
     organization_name: "{{ ca_organization }}"
     common_name: "{{ ansible_hostname }}"

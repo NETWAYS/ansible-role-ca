@@ -32,6 +32,7 @@ Some files are copied to the host you're running Ansible on.
 * `ca_ca_keylength`: CA keylength (default: `2048`)
 * `ca_server_cert`: Create server certificate as well (default: `true`)
 * `ca_logstash`: Create Logstash compatible certificate as well. Needs `ca_server_cert` to be set. (default: `true`)
+* `ca_keypassphrase`: Password for the client key (default: `ChangeMeAgain`)
 
 ## Example Playbook ##
 
@@ -45,7 +46,7 @@ GPLv3+
 Author Information
 ------------------
 
-This role was created in 2021 by Thomas Widhal <widhalmt@widhalm.or.at>
+This role was created in 2021 by Thomas Widhalm <widhalmt@widhalm.or.at>
 
 Some code used from:
 
