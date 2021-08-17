@@ -152,4 +152,13 @@
       group: root
       mode: 0600
 
+  - name: Create Logstash compatible key
+    command: >
+      openssl pkcs8
+        -in {{ ca_ca_dir }}/{{ ansible_hostname }}.key
+        -topk8
+        -out {{ ca_ca_dir }}/{{ ansible_hostname }}-pkcs8.key
+        -nocrypt
+    when: ca_logstash | bool
+
   when: ca_server_cert | bool
