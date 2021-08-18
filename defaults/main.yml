@@ -7,6 +7,9 @@ ca_ca_password: ChangeMe
 ca_localdir: /tmp/ca
 ca_ca_host: localhost
 
+ca_server_cert: true
+ca_logstash: false
+
 ca_country: EX
 ca_state: EX
 ca_locality: EX
