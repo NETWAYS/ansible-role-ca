@@ -31,7 +31,7 @@ Some files are copied to the host you're running Ansible on.
 * `ca_altname_1`: First alt name (default: `{{ ansible_fqdn }}`)
 * `ca_ca_keylength`: CA keylength (default: `2048`)
 * `ca_server_cert`: Create server certificate as well (default: `true`)
-* `ca_logstash`: Create Logstash compatible certificate as well. Needs `ca_server_cert` to be set. (default: `true`)
+* `ca_logstash`: Create Logstash compatible certificate as well. Needs `ca_server_cert` to be set. (default: `false`)
 * `ca_keypassphrase`: Password for the client key (default: `ChangeMeAgain`)
 
 ## Example Playbook ##
