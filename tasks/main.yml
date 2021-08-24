@@ -28,32 +28,32 @@
 
 - name: Create key
   openssl_privatekey:
-    path: "{{ ca_ca_dir }}/{{ ansible_hostname }}.key"
+    path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.key"
     passphrase: "{{ ca_keypassphrase }}"
     cipher: auto
 
 - name: Create CSR
   openssl_csr:
-    path: "{{ ca_ca_dir }}/{{ ansible_hostname }}.csr"
-    privatekey_path: "{{ ca_ca_dir }}/{{ ansible_hostname }}.key"
+    path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.csr"
+    privatekey_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.key"
     privatekey_passphrase: "{{ ca_keypassphrase }}"
     country_name: "{{ ca_country }}"
     organization_name: "{{ ca_organization }}"
-    common_name: "{{ ansible_hostname }}"
-    subject_alt_name: "DNS:{{ ca_altname_1 }},DNS:{{ ansible_fqdn }}"
+    common_name: "{{ inventory_hostname }}"
+    subject_alt_name: "DNS:{{ ansible_hostname }},DNS:{{ ansible_fqdn }}"
     extended_key_usage:
       - clientAuth
 
 - name: Pull CSR
   fetch:
-    src: "{{ ca_ca_dir }}/{{ ansible_hostname }}.csr"
-    dest: "{{ ca_localdir }}/{{ ansible_hostname }}.csr"
+    src: "{{ ca_ca_dir }}/{{ inventory_hostname }}.csr"
+    dest: "{{ ca_localdir }}/{{ inventory_hostname }}.csr"
     flat: true
 
 - name: Push CSR to CA host
   copy:
-    src: "{{ ca_localdir }}/{{ ansible_hostname }}.csr"
-    dest: "{{ ca_ca_dir }}/{{ ansible_hostname }}.csr"
+    src: "{{ ca_localdir }}/{{ inventory_hostname }}.csr"
+    dest: "{{ ca_ca_dir }}/{{ inventory_hostname }}.csr"
     owner: root
     group: root
     mode: 0600
@@ -61,8 +61,8 @@
 
 - name: Sign CSR with CA key
   openssl_certificate:
-    path: "{{ ca_ca_dir }}/{{ ansible_hostname }}.crt"
-    csr_path: "{{ ca_ca_dir }}/{{ ansible_hostname }}.csr"
+    path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.crt"
+    csr_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.csr"
     ownca_path: "{{ ca_ca_dir }}/ca.crt"
     ownca_privatekey_path: "{{ ca_ca_dir }}/ca.key"
     ownca_privatekey_passphrase: "{{ ca_ca_password }}"
@@ -71,15 +71,15 @@
 
 - name: Fetch certificate
   fetch:
-    src: "{{ ca_ca_dir }}/{{ ansible_hostname }}.crt"
-    dest: "{{ ca_localdir }}/{{ ansible_hostname }}.crt"
+    src: "{{ ca_ca_dir }}/{{ inventory_hostname }}.crt"
+    dest: "{{ ca_localdir }}/{{ inventory_hostname }}.crt"
     flat: true
   delegate_to: "{{ ca_ca_host }}"
 
 - name: Push certificate to client
   copy:
-    src: "{{ ca_localdir }}/{{ ansible_hostname }}.crt"
-    dest: "{{ ca_ca_dir }}/{{ ansible_hostname }}.crt"
+    src: "{{ ca_localdir }}/{{ inventory_hostname }}.crt"
+    dest: "{{ ca_ca_dir }}/{{ inventory_hostname }}.crt"
     owner: root
     group: root
     mode: 0600
@@ -106,26 +106,26 @@
 
   - name: Create server CSR
     openssl_csr:
-      path: "{{ ca_ca_dir }}/{{ ansible_hostname }}-server.csr"
-      privatekey_path: "{{ ca_ca_dir }}/{{ ansible_hostname }}.key"
+      path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.csr"
+      privatekey_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.key"
       privatekey_passphrase: "{{ ca_keypassphrase }}"
       country_name: "{{ ca_country }}"
       organization_name: "{{ ca_organization }}"
-      common_name: "{{ ansible_hostname }}"
-      subject_alt_name: "DNS:{{ ca_altname_1 }},DNS:{{ ansible_fqdn }}"
+      common_name: "{{ inventory_hostname }}"
+      subject_alt_name: "DNS:{{ ansible_hostname }},DNS:{{ ansible_fqdn }}"
       extended_key_usage:
         - serverAuth
 
   - name: Pull server CSR
     fetch:
-      src: "{{ ca_ca_dir }}/{{ ansible_hostname }}-server.csr"
-      dest: "{{ ca_localdir }}/{{ ansible_hostname }}-server.csr"
+      src: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.csr"
+      dest: "{{ ca_localdir }}/{{ inventory_hostname }}-server.csr"
       flat: true
 
   - name: Push server CSR to CA host
     copy:
-      src: "{{ ca_localdir }}/{{ ansible_hostname }}-server.csr"
-      dest: "{{ ca_ca_dir }}/{{ ansible_hostname }}-server.csr"
+      src: "{{ ca_localdir }}/{{ inventory_hostname }}-server.csr"
+      dest: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.csr"
       owner: root
       group: root
       mode: 0600
@@ -133,8 +133,8 @@
 
   - name: Sign server CSR with CA key
     openssl_certificate:
-      path: "{{ ca_ca_dir }}/{{ ansible_hostname }}-server.crt"
-      csr_path: "{{ ca_ca_dir }}/{{ ansible_hostname }}-server.csr"
+      path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.crt"
+      csr_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.csr"
       ownca_path: "{{ ca_ca_dir }}/ca.crt"
       ownca_privatekey_path: "{{ ca_ca_dir }}/ca.key"
       ownca_privatekey_passphrase: "{{ ca_ca_password }}"
@@ -143,15 +143,15 @@
 
   - name: Fetch server certificate
     fetch:
-      src: "{{ ca_ca_dir }}/{{ ansible_hostname }}-server.crt"
-      dest: "{{ ca_localdir }}/{{ ansible_hostname }}-server.crt"
+      src: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.crt"
+      dest: "{{ ca_localdir }}/{{ inventory_hostname }}-server.crt"
       flat: true
     delegate_to: "{{ ca_ca_host }}"
 
   - name: Push server certificate to client
     copy:
-      src: "{{ ca_localdir }}/{{ ansible_hostname }}-server.crt"
-      dest: "{{ ca_ca_dir }}/{{ ansible_hostname }}-server.crt"
+      src: "{{ ca_localdir }}/{{ inventory_hostname }}-server.crt"
+      dest: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.crt"
       owner: root
       group: root
       mode: 0600
@@ -159,13 +159,13 @@
   - name: Create Logstash compatible key
     command: >
       openssl pkcs8
-      -in {{ ca_ca_dir }}/{{ ansible_hostname }}.key
+      -in {{ ca_ca_dir }}/{{ inventory_hostname }}.key
       -topk8
       -passin pass:{{ ca_keypassphrase }}
-      -out {{ ca_ca_dir }}/{{ ansible_hostname }}-pkcs8.key
+      -out {{ ca_ca_dir }}/{{ inventory_hostname }}-pkcs8.key
       -nocrypt
     args:
-      creates: "{{ ca_ca_dir }}/{{ ansible_hostname }}-pkcs8.key"
+      creates: "{{ ca_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
     when: ca_logstash | bool
 
   when: ca_server_cert | bool

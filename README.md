@@ -26,7 +26,7 @@ Some files are copied to the host you're running Ansible on.
 * `ca_postalcode`: Setting for certificates (default: `1234`)
 * `ca_organization`: Setting for certificates (default: `example`)
 * `ca_organizationalunit`: Setting for certificates (default: `example`)
-* `ca_common_name`: CN for certificates (default: `{{ ansible_hostname }}`)
+* `ca_common_name`: CN for certificates (default: `{{ inventory_hostname }}`)
 * `ca_email`: E-Mail address for certificates (default: `root@{{ ansible_fqdn }}`)
 * `ca_altname_1`: First alt name (default: `{{ ansible_fqdn }}`)
 * `ca_ca_keylength`: CA keylength (default: `2048`)
