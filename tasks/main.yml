@@ -163,7 +163,7 @@
       -topk8
       -passin pass:{{ ca_keypassphrase }}
       -out {{ ca_ca_dir }}/{{ inventory_hostname }}-pkcs8.key
-      -nocrypt
+      -passout pass:{{ ca_keypassphrase }}
     args:
       creates: "{{ ca_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
     when: ca_logstash | bool
