@@ -10,6 +10,7 @@ galaxy_info:
     - name: EL
       version:
         - 7
+        - 8
   galaxy_tags:
     - system
     - ca

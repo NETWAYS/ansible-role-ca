@@ -6,7 +6,7 @@
 - name: Converge
   hosts: all
   vars:
-    ca_ca_host: ca_default_centos7
+    ca_ca_host: ca_default
   tasks:
     - name: "Include CA role"
       include_role:
