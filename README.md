@@ -8,7 +8,7 @@ A simple role to create a CA to create certificates and deploy them to hosts.
 
 The intended use is to create certificates you can use for connecting clients to main systems.
 
-The current version is only tested with CentOS 7 and Rocky 8. If you want to use other OS'es please note that the name of Molecule instance is hardcoded within `converge.yml`
+The current version is only tested with CentOS 7 and Rocky 8.
 
 Some files are copied to the host you're running Ansible on.
 

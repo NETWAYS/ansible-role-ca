@@ -4,14 +4,14 @@ dependency:
 driver:
   name: docker
 platforms:
-  - name: ca_default_${MOLECULE_DISTRO:-centos7}
+  - name: ca_default
     image: "geerlingguy/docker-${MOLECULE_DISTRO:-centos7}-ansible:latest"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     privileged: true
     pre_build_image: true
-  - name: ca_default_${MOLECULE_DISTRO:-centos7}_client
+  - name: ca_default_client
     image: "geerlingguy/docker-${MOLECULE_DISTRO:-centos7}-ansible:latest"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     volumes:
