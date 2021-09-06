@@ -13,6 +13,7 @@
     path: "{{ ca_localdir }}"
     state: directory
     mode: 0700
+  become: "{{ ca_local_become }}"
   delegate_to: localhost
 
 - name: Install openssl
