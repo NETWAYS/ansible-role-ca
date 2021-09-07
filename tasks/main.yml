@@ -31,7 +31,7 @@
   openssl_privatekey:
     path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.key"
     passphrase: "{{ ca_keypassphrase }}"
-    cipher: auto
+    cipher: "{{ ca_openssl_cipher }}"
 
 - name: Create CSR
   openssl_csr:

@@ -1,0 +1,8 @@
+---
+- name: Prepare
+  hosts: all
+  tasks:
+
+    - name: Install Python libraries
+      pip:
+        name: cryptography>= 1.2.3

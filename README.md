@@ -12,6 +12,10 @@ The current version is only tested with CentOS 7 and Rocky 8.
 
 Some files are copied to the host you're running Ansible on.
 
+## Requirements ##
+
+You need to have the Python library `cryptography` in version `>1.2.3` available. `PyOpenSSL` might also work, but is deprecated. Please note that different versions might have different requirements which ciphers to use. So watch your Playbook output and be ready to change `ca_openssl_cipher` if needed.
+
 ## Variables ##
 
 * `ca_manage_openssl`: Install `openssl` package? (default: `true`)
@@ -34,6 +38,7 @@ Some files are copied to the host you're running Ansible on.
 * `ca_server_cert`: Create server certificate as well (default: `true`)
 * `ca_logstash`: Create Logstash compatible certificate as well. Needs `ca_server_cert` to be set. (default: `false`)
 * `ca_keypassphrase`: Password for the client key (default: `ChangeMeAgain`)
+* `ca_openssl_cipher`: Cipher to use for key creation (default: `auto`)
 
 ## Example Playbook ##
 
