@@ -20,13 +20,6 @@
     name: openssl
   when: ca_manage_openssl | bool
 
-- name: Install Python libraries
-  package:
-    name:
-      - python2-cryptography
-      - pyOpenSSL
-  when: ca_manage_python | bool
-
 - name: Set up ca
   import_tasks: ca.yml
   when: ca_ca_host == inventory_hostname
@@ -35,7 +28,7 @@
   openssl_privatekey:
     path: "{{ ca_ca_dir }}/{{ ansible_hostname }}.key"
     passphrase: "{{ ca_keypassphrase }}"
-    cipher: aes-256-cbc
+    cipher: "{{ ca_openssl_cipher }}"
 
 - name: Create CSR
   openssl_csr:

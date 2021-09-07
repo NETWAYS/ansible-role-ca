@@ -12,6 +12,10 @@ The current version is only tested with CentOS 7. If you want to use other OS'es
 
 Some files are copied to the host you're running Ansible on.
 
+## Requirements ##
+
+You need to have the Python library `cryptography` in version `>1.2.3` available. `PyOpenSSL` might also work, but is deprecated. Please note that different versions might have different requirements which ciphers to use. So watch your Playbook output and be ready to change `ca_openssl_cipher` if needed.
+
 ## Variables ##
 
 * `ca_manage_openssl`: Install `openssl` package? (default: `true`)
@@ -32,6 +36,7 @@ Some files are copied to the host you're running Ansible on.
 * `ca_altname_1`: First alt name (default: `{{ ansible_fqdn }}`)
 * `ca_ca_keylength`: CA keylength (default: `2048`)
 * `ca_keypassphrase`: Password for the client key (default: `ChangeMeAgain`)
+* `ca_openssl_cipher`: Cipher to use for key creation (default: `auto`)
 
 ## Example Playbook ##
 
