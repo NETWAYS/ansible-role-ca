@@ -23,7 +23,7 @@ You need to have the Python library `cryptography` in version `>1.2.3` available
 * `ca_ca_days`: Runtime of the CA certificate (default: `3650`)
 * `ca_ca_password`: Password of CA key (default: `ChangeMe`)
 * `ca_localdir`: Temporary directory on Ansible management host (default: `/tmp/ca`)
-* `ca_local_become`: Use `become` on the Ansible controller. Used for creation of `ca_localdir`. (default: `no`)
+* `ca_local_become`: Use `become` on the Ansible controller. Used for creation of `ca_localdir`. (default: `false`)
 * `ca_ca_host`: Hostname of the CA host (default: `localhost`)
 * `ca_country`: Setting for certificates (default: `EX`)
 * `ca_state`: Setting for certificates (default: `EX`)
