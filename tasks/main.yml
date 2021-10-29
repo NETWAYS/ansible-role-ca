@@ -161,9 +161,16 @@
     - name: Handle Logstash compatible key
       block:
 
+        - name: Check if Logstash key is present
+          stat:
+            path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
+          register: key_stat
+
         - name: Move old Logstash key if common key was replaced
           command: "mv {{ ca_ca_dir }}/{{ inventory_hostname }}-pkcs8.key {{ ca_ca_dir }}/{{ inventory_hostname }}-pkcs8.key.{{ ansible_date_time.iso8601 }}"
-          when: key.changed | bool
+          when:
+            - key_stat.stat.exists | bool
+            - key.changed | bool
 
         - name: Create Logstash compatible key
           command: >
