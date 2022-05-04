@@ -28,9 +28,13 @@
 
         - name: Move old key
           command: "mv {{ ca_ca_dir }}/ca.key {{ ca_ca_dir }}/ca.key.{{ ansible_date_time.iso8601 }}"
+          args:
+            creates: "{{ ca_ca_dir }}/ca.key.{{ ansible_date_time.iso8601 }}"
 
         - name: Move old certificate
           command: "mv {{ ca_ca_dir }}/ca.crt {{ ca_ca_dir }}/ca.crt.{{ ansible_date_time.iso8601 }}"
+          args:
+            creates: "{{ ca_ca_dir }}/ca.key.{{ ansible_date_time.iso8601 }}"
 
       when:
         - not cakeyinfo.can_parse_key | bool
