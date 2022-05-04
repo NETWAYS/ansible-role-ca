@@ -42,7 +42,7 @@
     country_name: "{{ ca_country }}"
     organization_name: "{{ ca_organization }}"
     common_name: "{{ inventory_hostname }}"
-    subject_alt_name: "DNS:{{ ansible_hostname }},DNS:{{ ansible_fqdn }},DNS:{{ inventory_hostname }}"
+    subject_alt_name: "DNS:{{ ansible_hostname }},DNS:{{ ansible_fqdn }},DNS:{{ inventory_hostname }}" # yamllint disable-line rule:line-length
     extended_key_usage:
       - clientAuth
 
@@ -114,7 +114,7 @@
         country_name: "{{ ca_country }}"
         organization_name: "{{ ca_organization }}"
         common_name: "{{ inventory_hostname }}"
-        subject_alt_name: "DNS:{{ ansible_hostname }},DNS:{{ ansible_fqdn }},DNS:{{ inventory_hostname }}"
+        subject_alt_name: "DNS:{{ ansible_hostname }},DNS:{{ ansible_fqdn }},DNS:{{ inventory_hostname }}" # yamllint disable-line rule:line-length
         extended_key_usage:
           - serverAuth
 
@@ -167,7 +167,12 @@
           register: key_stat
 
         - name: Move old Logstash key if common key was replaced
-          command: "mv {{ ca_ca_dir }}/{{ inventory_hostname }}-pkcs8.key {{ ca_ca_dir }}/{{ inventory_hostname }}-pkcs8.key.{{ ansible_date_time.iso8601 }}"
+          command: >
+            mv
+            {{ ca_ca_dir }}/{{ inventory_hostname }}-pkcs8.key
+            {{ ca_ca_dir }}/\
+            {{ inventory_hostname }}-pkcs8.key.\
+            {{ ansible_date_time.iso8601 }}
           when:
             - key_stat.stat.exists | bool
             - key.changed | bool
