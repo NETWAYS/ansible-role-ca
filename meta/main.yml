@@ -2,7 +2,8 @@
 
 galaxy_info:
   role_name: ca
-  author: widhalmt
+  author: netways
+  company: "Netways GmbH"
   description: OpenSSL CA
   license: license (GPL-3.0-or-later)
   min_ansible_version: 2.4

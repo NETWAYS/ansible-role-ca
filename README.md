@@ -2,7 +2,7 @@
 
 **NOTE** Not finished, not for production use
 
-[![CI](https://github.com/widhalmt/ansible-role-ca/workflows/Molecule%20Test/badge.svg?event=push)](https://github.com/widhalmt/ansible-role-ca/workflows/Molecule%20Test/badge.svg)
+[![CI](https://github.com/netways/ansible-role-ca/workflows/Molecule%20Test/badge.svg?event=push)](https://github.com/netways/ansible-role-ca/workflows/Molecule%20Test/badge.svg)
 
 A simple role to create a CA to create certificates and deploy them to hosts.
 
@@ -53,6 +53,7 @@ Author Information
 ------------------
 
 This role was created in 2021 by Thomas Widhalm <widhalmt@widhalm.or.at>
+Moved Maintainer to NETways in 2022
 
 Some code used from:
 
