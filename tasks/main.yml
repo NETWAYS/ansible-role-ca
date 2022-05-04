@@ -42,9 +42,10 @@
     country_name: "{{ ca_country }}"
     organization_name: "{{ ca_organization }}"
     common_name: "{{ inventory_hostname }}"
-    subject_alt_name: "DNS:{{ ansible_hostname }},\
-                       DNS:{{ ansible_fqdn }},\
-                       DNS:{{ inventory_hostname }}"
+    subject_alt_name: >
+     DNS:{{ ansible_hostname }},
+     DNS:{{ ansible_fqdn }},
+     DNS:{{ inventory_hostname }}
     extended_key_usage:
       - clientAuth
 
@@ -116,9 +117,10 @@
         country_name: "{{ ca_country }}"
         organization_name: "{{ ca_organization }}"
         common_name: "{{ inventory_hostname }}"
-        subject_alt_name: "DNS:{{ ansible_hostname }},
-                           DNS:{{ ansible_fqdn }},
-                           DNS:{{ inventory_hostname }}"
+        subject_alt_name: >
+          DNS:{{ ansible_hostname }},
+          DNS:{{ ansible_fqdn }},
+          DNS:{{ inventory_hostname }}
         extended_key_usage:
           - serverAuth
 
