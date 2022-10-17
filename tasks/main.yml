@@ -30,7 +30,7 @@
 - name: Create key
   openssl_privatekey:
     path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.key"
-    passphrase: "{{ ca_keypassphrase }}"
+    passphrase: "{{ ca_keypassphrase | default(omit) }}"
     cipher: "{{ ca_openssl_cipher }}"
   register: key
 
@@ -38,7 +38,7 @@
   openssl_csr:
     path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.csr"
     privatekey_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.key"
-    privatekey_passphrase: "{{ ca_keypassphrase }}"
+    privatekey_passphrase: "{{ ca_keypassphrase | default(omit) }}"
     country_name: "{{ ca_country }}"
     organization_name: "{{ ca_organization }}"
     common_name: "{{ inventory_hostname }}"
@@ -110,7 +110,7 @@
       openssl_csr:
         path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.csr"
         privatekey_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.key"
-        privatekey_passphrase: "{{ ca_keypassphrase }}"
+        privatekey_passphrase: "{{ ca_keypassphrase | default(omit) }}"
         country_name: "{{ ca_country }}"
         organization_name: "{{ ca_organization }}"
         common_name: "{{ inventory_hostname }}"
@@ -182,9 +182,9 @@
             openssl pkcs8
             -in {{ ca_ca_dir }}/{{ inventory_hostname }}.key
             -topk8
-            -passin pass:{{ ca_keypassphrase }}
+            -passin pass:{{ ca_keypassphrase | default(omit) }}
             -out {{ ca_ca_dir }}/{{ inventory_hostname }}-pkcs8.key
-            -passout pass:{{ ca_keypassphrase }}
+            -passout pass:{{ ca_keypassphrase | default(omit) }}
           args:
             creates: "{{ ca_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
 

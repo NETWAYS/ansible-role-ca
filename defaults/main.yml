@@ -24,5 +24,4 @@ ca_altname_2: "{{ ansible_fqdn }}"
 ca_altname_3: "{{ inventory_hostname }}"
 ca_ca_keylength: 2048
 
-ca_keypassphrase: ChangeMeAgain
 ca_openssl_cipher: auto
