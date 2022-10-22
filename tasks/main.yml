@@ -56,9 +56,6 @@
     common_name: "{{ inventory_hostname }}"
     subject_alt_name: "DNS:{{ ansible_hostname }},DNS:{{ ansible_fqdn }},DNS:{{ inventory_hostname }}" # yamllint disable-line rule:line-length
     extended_key_usage: "{{ extended_key_usage | default(omit) }}"
-    owner: "{{ client_ca_dir_owner }}"
-    group: "{{ client_ca_dir_group }}"
-    mode: "{{ client_ca_dir_mode }}"
 
 - name: Pull CSR
   fetch:
@@ -130,9 +127,6 @@
         common_name: "{{ inventory_hostname }}"
         subject_alt_name: "DNS:{{ ansible_hostname }},DNS:{{ ansible_fqdn }},DNS:{{ inventory_hostname }}" # yamllint disable-line rule:line-length
         extended_key_usage: "{{ extended_key_usage | default(omit) }}"
-        owner: "{{ client_ca_dir_owner }}"
-        group: "{{ client_ca_dir_group }}"
-        mode: "{{ client_ca_dir_mode }}"
 
     - name: Pull server CSR
       fetch:
