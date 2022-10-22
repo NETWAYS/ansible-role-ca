@@ -1,5 +1,13 @@
 ---
 
+- name: Ensure CA directory exists on clients
+  file:
+    path: "{{ client_ca_dir }}"
+    owner: "{{ client_ca_dir_owner }}"
+    group: "{{ client_ca_dir_group }}"
+    mode: "{{ client_ca_dir_mode }}"
+    state: directory
+
 - name: Ensure CA directory exists
   file:
     path: "{{ ca_ca_dir }}"
@@ -7,6 +15,7 @@
     group: root
     mode: 0700
     state: directory
+  delegate_to: "{{ ca_ca_host }}"
 
 - name: Ensure local directory on Ansible host exists
   file:
@@ -29,26 +38,28 @@
 
 - name: Create key
   openssl_privatekey:
-    path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.key"
+    path: "{{ client_ca_dir }}/{{ inventory_hostname }}.key"
     passphrase: "{{ ca_keypassphrase | default(omit) }}"
-    cipher: "{{ ca_openssl_cipher }}"
+    cipher: "{{ ca_openssl_cipher | default(omit) }}"
+    owner: "{{ client_ca_dir_owner }}"
+    group: "{{ client_ca_dir_group }}"
+    mode: "{{ client_ca_dir_mode }}"
   register: key
 
 - name: Create CSR
   openssl_csr:
-    path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.csr"
-    privatekey_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.key"
+    path: "{{ client_ca_dir }}/{{ inventory_hostname }}.csr"
+    privatekey_path: "{{ client_ca_dir }}/{{ inventory_hostname }}.key"
     privatekey_passphrase: "{{ ca_keypassphrase | default(omit) }}"
     country_name: "{{ ca_country }}"
     organization_name: "{{ ca_organization }}"
     common_name: "{{ inventory_hostname }}"
     subject_alt_name: "DNS:{{ ansible_hostname }},DNS:{{ ansible_fqdn }},DNS:{{ inventory_hostname }}" # yamllint disable-line rule:line-length
-    extended_key_usage:
-      - clientAuth
+    extended_key_usage: "{{ extended_key_usage | default(omit) }}"
 
 - name: Pull CSR
   fetch:
-    src: "{{ ca_ca_dir }}/{{ inventory_hostname }}.csr"
+    src: "{{ client_ca_dir }}/{{ inventory_hostname }}.csr"
     dest: "{{ ca_localdir }}/{{ inventory_hostname }}.csr"
     flat: true
 
@@ -81,10 +92,10 @@
 - name: Push certificate to client
   copy:
     src: "{{ ca_localdir }}/{{ inventory_hostname }}.crt"
-    dest: "{{ ca_ca_dir }}/{{ inventory_hostname }}.crt"
-    owner: root
-    group: root
-    mode: 0600
+    dest: "{{ client_ca_dir }}/{{ inventory_hostname }}.crt"
+    owner:  "{{ client_ca_dir_owner }}"
+    group: "{{ client_ca_dir_group }}"
+    mode: "{{ client_ca_dir_mode }}"
 
 - name: Fetch CA certificate
   fetch:
@@ -96,10 +107,10 @@
 - name: Push CA certificate to client
   copy:
     src: "{{ ca_localdir }}/ca.crt"
-    dest: "{{ ca_ca_dir }}/ca.crt"
-    owner: root
-    group: root
-    mode: 0600
+    dest: "{{ client_ca_dir }}/ca.crt"
+    owner: "{{ client_ca_dir_owner }}"
+    group: "{{ client_ca_dir_group }}"
+    mode: "{{ client_ca_dir_mode }}"
 
 ### server certificate ###
 
@@ -108,19 +119,18 @@
 
     - name: Create server CSR
       openssl_csr:
-        path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.csr"
-        privatekey_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.key"
+        path: "{{ client_ca_dir }}/{{ inventory_hostname }}-server.csr"
+        privatekey_path: "{{ client_ca_dir }}/{{ inventory_hostname }}.key"
         privatekey_passphrase: "{{ ca_keypassphrase | default(omit) }}"
         country_name: "{{ ca_country }}"
         organization_name: "{{ ca_organization }}"
         common_name: "{{ inventory_hostname }}"
         subject_alt_name: "DNS:{{ ansible_hostname }},DNS:{{ ansible_fqdn }},DNS:{{ inventory_hostname }}" # yamllint disable-line rule:line-length
-        extended_key_usage:
-          - serverAuth
+        extended_key_usage: "{{ extended_key_usage | default(omit) }}"
 
     - name: Pull server CSR
       fetch:
-        src: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.csr"
+        src: "{{ client_ca_dir }}/{{ inventory_hostname }}-server.csr"
         dest: "{{ ca_localdir }}/{{ inventory_hostname }}-server.csr"
         flat: true
 
@@ -153,10 +163,10 @@
     - name: Push server certificate to client
       copy:
         src: "{{ ca_localdir }}/{{ inventory_hostname }}-server.crt"
-        dest: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.crt"
-        owner: root
-        group: root
-        mode: 0600
+        dest: "{{ client_ca_dir }}/{{ inventory_hostname }}-server.crt"
+        owner: "{{ client_ca_dir_owner }}"
+        group: "{{ client_ca_dir_group }}"
+        mode: "{{ client_ca_dir_mode }}"
 
     - name: Handle Logstash compatible key
       block:
