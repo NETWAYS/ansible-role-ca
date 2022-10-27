@@ -2,10 +2,10 @@
 
 ca_manage_openssl: true
 ca_ca_dir: /opt/ca
-client_ca_dir: /opt/ca
-client_ca_dir_owner: root
-client_ca_dir_group: root
-client_ca_dir_mode: 0700
+ca_client_ca_dir: /opt/ca
+ca_client_ca_dir_owner: root
+ca_client_ca_dir_group: root
+ca_client_ca_dir_mode: 0700
 ca_ca_days: 3650
 ca_ca_password: ChangeMe
 ca_localdir: /tmp/ca
@@ -27,4 +27,3 @@ ca_altname_1: "{{ ansible_hostname }}"
 ca_altname_2: "{{ ansible_fqdn }}"
 ca_altname_3: "{{ inventory_hostname }}"
 ca_ca_keylength: 2048
-
