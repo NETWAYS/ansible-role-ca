@@ -1,7 +1,7 @@
 ---
 
 - name: Ensure CA directory exists on clients
-  file:
+  ansbile.builtin.file:
     path: "{{ ca_client_ca_dir }}"
     owner: "{{ ca_client_ca_dir_owner }}"
     group: "{{ ca_client_ca_dir_group }}"
@@ -9,7 +9,7 @@
     state: directory
 
 - name: Ensure CA directory exists
-  file:
+  ansbile.builtin.file:
     path: "{{ ca_ca_dir }}"
     owner: root
     group: root
@@ -18,7 +18,7 @@
   delegate_to: "{{ ca_ca_host }}"
 
 - name: Ensure local directory on Ansible host exists
-  file:
+  ansbile.builtin.file:
     path: "{{ ca_localdir }}"
     state: directory
     mode: 0700
@@ -26,7 +26,7 @@
   delegate_to: localhost
 
 - name: Install openssl
-  package:
+  ansbile.builtin.package:
     name: openssl
   when: ca_manage_openssl | bool
 
@@ -58,13 +58,13 @@
     extended_key_usage: "{{ extended_key_usage | default(omit) }}"
 
 - name: Pull CSR
-  fetch:
+  ansbile.builtin.fetch:
     src: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.csr"
     dest: "{{ ca_localdir }}/{{ inventory_hostname }}.csr"
     flat: true
 
 - name: Push CSR to CA host
-  copy:
+  ansbile.builtin.copy:
     src: "{{ ca_localdir }}/{{ inventory_hostname }}.csr"
     dest: "{{ ca_ca_dir }}/{{ inventory_hostname }}.csr"
     owner: root
@@ -83,14 +83,14 @@
   delegate_to: "{{ ca_ca_host }}"
 
 - name: Fetch certificate
-  fetch:
+  ansbile.builtin.fetch:
     src: "{{ ca_ca_dir }}/{{ inventory_hostname }}.crt"
     dest: "{{ ca_localdir }}/{{ inventory_hostname }}.crt"
     flat: true
   delegate_to: "{{ ca_ca_host }}"
 
 - name: Push certificate to client
-  copy:
+  ansbile.builtin.copy:
     src: "{{ ca_localdir }}/{{ inventory_hostname }}.crt"
     dest: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.crt"
     owner: "{{ ca_client_ca_dir_owner }}"
@@ -98,14 +98,14 @@
     mode: "{{ ca_client_ca_dir_mode }}"
 
 - name: Fetch CA certificate
-  fetch:
+  ansbile.builtin.fetch:
     src: "{{ ca_ca_dir }}/ca.crt"
     dest: "{{ ca_localdir }}/ca.crt"
     flat: true
   delegate_to: "{{ ca_ca_host }}"
 
 - name: Push CA certificate to client
-  copy:
+  ansbile.builtin.copy:
     src: "{{ ca_localdir }}/ca.crt"
     dest: "{{ ca_client_ca_dir }}/ca.crt"
     owner: "{{ ca_client_ca_dir_owner }}"
@@ -129,13 +129,13 @@
         extended_key_usage: "{{ extended_key_usage | default(omit) }}"
 
     - name: Pull server CSR
-      fetch:
+      ansbile.builtin.fetch:
         src: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-server.csr"
         dest: "{{ ca_localdir }}/{{ inventory_hostname }}-server.csr"
         flat: true
 
     - name: Push server CSR to CA host
-      copy:
+      ansbile.builtin.copy:
         src: "{{ ca_localdir }}/{{ inventory_hostname }}-server.csr"
         dest: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.csr"
         owner: root
@@ -154,14 +154,14 @@
       delegate_to: "{{ ca_ca_host }}"
 
     - name: Fetch server certificate
-      fetch:
+      ansbile.builtin.fetch:
         src: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.crt"
         dest: "{{ ca_localdir }}/{{ inventory_hostname }}-server.crt"
         flat: true
       delegate_to: "{{ ca_ca_host }}"
 
     - name: Push server certificate to client
-      copy:
+      ansbile.builtin.copy:
         src: "{{ ca_localdir }}/{{ inventory_hostname }}-server.crt"
         dest: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-server.crt"
         owner: "{{ ca_client_ca_dir_owner }}"
@@ -172,12 +172,12 @@
       block:
 
         - name: Check if Logstash key is present
-          stat:
+          ansbile.builtin.stat:
             path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
           register: key_stat
 
         - name: Move old Logstash key if common key was replaced
-          command: >
+          ansbile.builtin.command: >
             mv
             {{ ca_ca_dir }}/{{ inventory_hostname }}-pkcs8.key
             {{ ca_ca_dir }}/\
@@ -188,7 +188,7 @@
             - key.changed | bool
 
         - name: Create Logstash compatible key
-          command: >
+          ansbile.builtin.command: >
             openssl pkcs8
             -in {{ ca_ca_dir }}/{{ inventory_hostname }}.key
             -topk8
@@ -199,7 +199,7 @@
             creates: "{{ ca_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
 
         - name: Set permissions on Logstash key
-          file:
+          ansbile.builtin.file:
             path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
             owner: root
             group: root
