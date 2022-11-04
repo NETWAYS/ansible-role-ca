@@ -1,7 +1,7 @@
 ---
 
 - name: Place CA configuration file
-  ansbile.builtin.template:
+  ansible.builtin.template:
     src: ca.conf.j2
     dest: "{{ ca_ca_dir }}/ca.conf"
     owner: root
@@ -9,7 +9,7 @@
     mode: 0600
 
 - name: Check if CA key is already created
-  ansbile.builtin.stat:
+  ansible.builtin.stat:
     path: "{{ ca_ca_dir }}/ca.key"
   register: cakey
 
@@ -27,7 +27,7 @@
       block:
 
         - name: Move old key
-          ansbile.builtin.command: >
+          ansible.builtin.command: >
             mv
             {{ ca_ca_dir }}/ca.key
             {{ ca_ca_dir }}/ca.key.{{ ansible_date_time.iso8601 }}
@@ -35,7 +35,7 @@
             creates: "{{ ca_ca_dir }}/ca.key.{{ ansible_date_time.iso8601 }}"
 
         - name: Move old certificate
-          ansbile.builtin.command: >
+          ansible.builtin.command: >
             mv
             {{ ca_ca_dir }}/ca.crt
             {{ ca_ca_dir }}/ca.crt.{{ ansible_date_time.iso8601 }}
@@ -48,7 +48,7 @@
   when: cakey.stat.exists
 
 - name: Generate CA key
-  ansbile.builtin.command: >
+  ansible.builtin.command: >
     openssl genrsa
     -aes256
     -passout pass:{{ ca_ca_password }}
@@ -58,7 +58,7 @@
     creates: "{{ ca_ca_dir }}/ca.key"
 
 - name: Generate CA certificate
-  ansbile.builtin.command: >
+  ansible.builtin.command: >
     openssl req
     -x509
     -new
