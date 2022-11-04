@@ -34,6 +34,28 @@
   import_tasks: ca.yml
   when: ca_ca_host == inventory_hostname
 
+- name: Set temporary variable ca_san to hostname, FQDN, and inventory hostname
+  set_fact:
+    ca_san: "DNS:{{ ansible_hostname }},DNS:{{ ansible_fqdn }},DNS:{{ inventory_hostname }}"
+
+- name: Add IP addresses and loopback address for etcd >= 3.2.0 to ca_san
+  set_fact: 
+    ca_san: >-
+      {{ ca_san }},
+      IP:127.0.0.1,
+      {%- for host in vars['play_hosts'] -%}
+        IP:{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}
+        {%- if not loop.last -%}
+          ,
+        {%- endif -%}
+      {%- endfor -%}
+  when: ca_etcd | bool
+
+- name: Combine ca_san and ca_san_custom if defined
+  set_fact:
+    ca_san: "{{ca_san + ca_san_custom }}"
+  when: ca_san_custom is defined
+
 ### client certificate ###
 
 - name: Create key
@@ -54,7 +76,7 @@
     country_name: "{{ ca_country }}"
     organization_name: "{{ ca_organization }}"
     common_name: "{{ inventory_hostname }}"
-    subject_alt_name: "DNS:{{ ansible_hostname }},DNS:{{ ansible_fqdn }},DNS:{{ inventory_hostname }}" # yamllint disable-line rule:line-length
+    subject_alt_name: "{{ ca_san | regex_replace(' ', '') }}"
     extended_key_usage: "{{ extended_key_usage | default(omit) }}"
 
 - name: Pull CSR
@@ -125,7 +147,7 @@
         country_name: "{{ ca_country }}"
         organization_name: "{{ ca_organization }}"
         common_name: "{{ inventory_hostname }}"
-        subject_alt_name: "DNS:{{ ansible_hostname }},DNS:{{ ansible_fqdn }},DNS:{{ inventory_hostname }}" # yamllint disable-line rule:line-length
+        subject_alt_name: "{{ ca_san | regex_replace(' ', '') }}"
         extended_key_usage: "{{ extended_key_usage | default(omit) }}"
 
     - name: Pull server CSR
