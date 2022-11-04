@@ -37,7 +37,7 @@
 ### client certificate ###
 
 - name: Create key
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
     passphrase: "{{ ca_keypassphrase | default(omit) }}"
     cipher: "{{ ca_openssl_cipher | default(omit) }}"
@@ -47,7 +47,7 @@
   register: key
 
 - name: Create CSR
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.csr"
     privatekey_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
     privatekey_passphrase: "{{ ca_keypassphrase | default(omit) }}"
@@ -73,7 +73,7 @@
   delegate_to: "{{ ca_ca_host }}"
 
 - name: Sign CSR with CA key
-  openssl_certificate:
+  community.crypto.openssl_certificate:
     path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.crt"
     csr_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.csr"
     ownca_path: "{{ ca_ca_dir }}/ca.crt"
@@ -93,7 +93,7 @@
   copy:
     src: "{{ ca_localdir }}/{{ inventory_hostname }}.crt"
     dest: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.crt"
-    owner:  "{{ ca_client_ca_dir_owner }}"
+    owner: "{{ ca_client_ca_dir_owner }}"
     group: "{{ ca_client_ca_dir_group }}"
     mode: "{{ ca_client_ca_dir_mode }}"
 
@@ -118,7 +118,7 @@
   block:
 
     - name: Create server CSR
-      openssl_csr:
+      community.crypto.openssl_csr:
         path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-server.csr"
         privatekey_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
         privatekey_passphrase: "{{ ca_keypassphrase | default(omit) }}"
@@ -144,7 +144,7 @@
       delegate_to: "{{ ca_ca_host }}"
 
     - name: Sign server CSR with CA key
-      openssl_certificate:
+      community.crypto.openssl_certificate:
         path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.crt"
         csr_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.csr"
         ownca_path: "{{ ca_ca_dir }}/ca.crt"
