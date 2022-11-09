@@ -33,7 +33,7 @@ You need to have the Python library `cryptography` in version `>1.2.3` available
 * `ca_organizationalunit`: Setting for certificates (default: `example`)
 * `ca_common_name`: CN for certificates (default: `{{ inventory_hostname }}`)
 * `ca_email`: E-Mail address for certificates (default: `root@{{ ansible_fqdn }}`)
-* `ca_san_custom`: Define additional custom SAN (X509v3 Subject Alternative Name), default not defined
+* `ca_san_custom`: Define additional custom SAN (X509v3 Subject Alternative Name) as comma separated list, default not defined
 * `ca_altname_1`: First alt name (default: `{{ ansible_fqdn }}`)
 * `ca_ca_keylength`: CA keylength (default: `2048`)
 * `ca_server_cert`: Create server certificate as well (default: `true`)
