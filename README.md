@@ -38,7 +38,7 @@ You need to have the Python library `cryptography` in version `>1.2.3` available
 * `ca_ca_keylength`: CA keylength (default: `2048`)
 * `ca_server_cert`: Create server certificate as well (default: `true`)
 * `ca_logstash`: Create Logstash compatible certificate as well. Needs `ca_server_cert` to be set. (default: `false`)
-* `ca_etcd`: Create etcd compatible certificate as well. Needs `ca_server_cert` to be set. If set, the string has to begin with a ','. (default: `false`)
+* `ca_etcd`: Create etcd compatible certificate as well. Needs `ca_server_cert` to be set. (default: `false`)
 * `ca_keypassphrase`: Password for the client key, default not defined
 * `ca_openssl_cipher`: Cipher to use for key creation, default not defined
 * `ca_client_ca_dir`: Directory to place CA and certificates on the clients (default: `/opt/ca`)
