@@ -56,7 +56,7 @@
 
 - name: Combine ca_san and ca_san_custom if defined
   set_fact:
-    ca_san: "{{ca_san + ca_san_custom }}"
+    ca_san: "{{ ca_san + "," + ca_san_custom }}"
   when: ca_san_custom is defined
 
 ### client certificate ###
