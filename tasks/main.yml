@@ -36,7 +36,10 @@
 
 - name: Set temporary variable ca_san to hostname, FQDN, and inventory hostname
   set_fact:
-    ca_san: "DNS:{{ ansible_hostname }},DNS:{{ ansible_fqdn }},DNS:{{ inventory_hostname }}"
+    ca_san: >-
+      "DNS:{{ ansible_hostname }},
+      DNS:{{ ansible_fqdn }},
+      DNS:{{ inventory_hostname }}"
 
 - name: Add IP addresses and loopback address for etcd >= 3.2.0 to ca_san
   set_fact:
