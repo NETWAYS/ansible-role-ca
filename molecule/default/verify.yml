@@ -4,6 +4,7 @@
   hosts: all
   vars:
     ca_ca_dir: /opt/ca
+    ca_client_ca_dir: /opt/ca
   tasks:
 
   - name: Verify signature on certificate
