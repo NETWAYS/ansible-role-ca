@@ -5,9 +5,21 @@
   vars:
     ca_ca_dir: /opt/ca
   tasks:
+
   - name: Verify signature on certificate
     command: >
       openssl verify
       -verbose
       -CAfile {{ ca_ca_dir }}/ca.crt
       {{ ca_ca_dir }}/{{ inventory_hostname }}.crt
+
+  - name: Check if instance key is present
+    stat:
+      path: "/opt/logstash-ca/instance.key"
+    register: instance_key_stat
+
+  - name: Fail if instance key is missing
+    fail:
+      msg: "Instance key is missing"
+    when:
+      - not instance_key_stat.stat.exists | bool
