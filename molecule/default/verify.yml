@@ -14,7 +14,7 @@
         -CAfile {{ ca_ca_dir }}/ca.crt
         {{ ca_client_ca_dir }}/{{ inventory_hostname }}.crt
 
-    - name: Verify signature on service certificate
+    - name: Verify signature on server certificate
       command: >
         openssl verify
         -verbose
