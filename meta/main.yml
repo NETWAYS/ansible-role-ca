@@ -6,7 +6,7 @@ galaxy_info:
   company: "Netways GmbH"
   description: OpenSSL CA
   license: license (GPL-3.0-or-later)
-  min_ansible_version: 2.4
+  min_ansible_version: "2.4"
   platforms:
     - name: EL
       version:

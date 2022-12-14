@@ -7,31 +7,38 @@
     ca_client_ca_dir: /opt/ca
   tasks:
 
-  - name: Verify signature on certificate
-    command: >
-      openssl verify
-      -verbose
-      -CAfile {{ ca_ca_dir }}/ca.crt
-      {{ ca_client_ca_dir }}/{{ inventory_hostname }}.crt
+    - name: Verify signature on certificate
+      command: >
+        openssl verify
+        -verbose
+        -CAfile {{ ca_ca_dir }}/ca.crt
+        {{ ca_client_ca_dir }}/{{ inventory_hostname }}.crt
 
-  - name: Check if instance key is present
-    stat:
-      path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
-    register: instance_key_stat
+    - name: Verify signature on service certificate
+      command: >
+        openssl verify
+        -verbose
+        -CAfile {{ ca_ca_dir }}/ca.crt
+        {{ ca_client_ca_dir }}/{{ inventory_hostname }}-server.crt
 
-  - name: Fail if instance key is missing
-    fail:
-      msg: "Instance key is missing"
-    when:
-      - not instance_key_stat.stat.exists | bool
+    - name: Check if instance key is present
+      stat:
+        path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
+      register: instance_key_stat
 
-  - name: Check if Logstash key is present
-    stat:
-      path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
-    register: logstash_key_stat
+    - name: Fail if instance key is missing
+      fail:
+        msg: "Instance key is missing"
+      when:
+        - not instance_key_stat.stat.exists | bool
 
-  - name: Fail if Logstash key is missing
-    fail:
-      msg: "Logstash key is missing"
-    when:
-      - not logstash_key_stat.stat.exists | bool
+    - name: Check if Logstash key is present
+      stat:
+        path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
+      register: logstash_key_stat
+
+    - name: Fail if Logstash key is missing
+      fail:
+        msg: "Logstash key is missing"
+      when:
+        - not logstash_key_stat.stat.exists | bool
