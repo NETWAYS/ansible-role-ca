@@ -93,7 +93,7 @@
   copy:
     src: "{{ ca_localdir }}/{{ inventory_hostname }}.crt"
     dest: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.crt"
-    owner:  "{{ ca_client_ca_dir_owner }}"
+    owner: "{{ ca_client_ca_dir_owner }}"
     group: "{{ ca_client_ca_dir_group }}"
     mode: "{{ ca_client_ca_dir_mode }}"
 
@@ -115,6 +115,7 @@
 ### server certificate ###
 
 - name: Create server certificate
+  when: ca_server_cert | bool
   block:
 
     - name: Create server CSR
@@ -169,6 +170,7 @@
         mode: "{{ ca_client_ca_dir_mode }}"
 
     - name: Handle Logstash compatible key
+      when: ca_logstash | bool
       block:
 
         - name: Check if Logstash key is present
@@ -204,7 +206,3 @@
             owner: root
             group: root
             mode: 0600
-
-      when: ca_logstash | bool
-
-  when: ca_server_cert | bool

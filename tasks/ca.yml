@@ -14,6 +14,7 @@
   register: cakey
 
 - name: Test and prepare key
+  when: cakey.stat.exists
   block:
 
     - name: Test CA key if present
@@ -24,6 +25,8 @@
       failed_when: false
 
     - name: Prepare for new key
+      when:
+        - not cakeyinfo.can_parse_key | bool
       block:
 
         - name: Move old key
@@ -41,11 +44,6 @@
             {{ ca_ca_dir }}/ca.crt.{{ ansible_date_time.iso8601 }}
           args:
             creates: "{{ ca_ca_dir }}/ca.key.{{ ansible_date_time.iso8601 }}"
-
-      when:
-        - not cakeyinfo.can_parse_key | bool
-
-  when: cakey.stat.exists
 
 - name: Generate CA key
   command: >
