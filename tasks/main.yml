@@ -173,14 +173,14 @@
 
         - name: Check if Logstash key is present
           stat:
-            path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
+            path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
           register: key_stat
 
         - name: Move old Logstash key if common key was replaced
           command: >
             mv
-            {{ ca_ca_dir }}/{{ inventory_hostname }}-pkcs8.key
-            {{ ca_ca_dir }}/\
+            {{ ca_client_ca_dir }}/{{ inventory_hostname }}-pkcs8.key
+            {{ ca_client_ca_dir }}/\
             {{ inventory_hostname }}-pkcs8.key.\
             {{ ansible_date_time.iso8601 }}
           when:
@@ -190,17 +190,17 @@
         - name: Create Logstash compatible key
           command: >
             openssl pkcs8
-            -in {{ ca_ca_dir }}/{{ inventory_hostname }}.key
+            -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}.key
             -topk8
             -passin pass:{{ ca_keypassphrase | default(omit) }}
-            -out {{ ca_ca_dir }}/{{ inventory_hostname }}-pkcs8.key
+            -out {{ ca_client_ca_dir }}/{{ inventory_hostname }}-pkcs8.key
             -passout pass:{{ ca_keypassphrase | default(omit) }}
           args:
-            creates: "{{ ca_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
+            creates: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
 
         - name: Set permissions on Logstash key
           file:
-            path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
+            path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
             owner: root
             group: root
             mode: 0600
