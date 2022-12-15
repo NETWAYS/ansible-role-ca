@@ -6,7 +6,7 @@
 
 A simple role to create a CA to create certificates and deploy them to hosts.
 
-The intended use is to create certificates you can use for connecting clients to main systems.
+The intended use is to create certificates you can use for connecting clients to main systems. As there are several tools that require keys and certificates with different options set, the role should be able to create them, too. These more specialised keys and certificate must not replace the default ones. See [Contributing](#contributing) below for details. The idea is to run the role once on all hosts in the infrastructure to create all certificates and keys.
 
 The current version is only tested with CentOS 7 and Rocky 8.
 
@@ -49,6 +49,16 @@ You need to have the Python library `cryptography` in version `>1.2.3` available
     - hosts: all
       roles:
         - ca
+
+## Contributing ##
+
+Contributions are very welcome! Please make sure you stick to the following rules:
+
+* The role must be able to run once on all hosts in the inventory and create all keys and certificates. You can not introduce changes that need an extra run with different variables. Of course, if you want, you can have different variable sets and run it several times e.g. to have more than one CA. It's about parameters for more specialised keys and certificates, they must not interfere with the existing ones.
+* If you want to introduce a new kind of key or certificate, please make sure to create it additionally to the current variants. This role is used in projects where every host relies on a certificate created by this role. Changing the existing ones might break it.
+* If you create new files that could be used for different usecases, please use a suffix that explains what kind of file you're providing. e.g. We introduced keys in PKCS8 format to use for Logstash. But since other tools might want to use them, too, we added `-pkcs8` as suffix. So the filenames are `instance.key` for the default one and `instance-pkcs8.key`.
+* If you create files that are dedicated to a certain service and shouldn't be used by anything else, use the name of the service/tool as suffix. For example when you add all IPs within a cluster to SAN that's very specific. So add a suffix naming the tool you build them for.
+
 ## License ##
 
 GPLv3+
