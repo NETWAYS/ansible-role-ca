@@ -231,7 +231,7 @@
               ,
             {%- endif -%}
           {%- endfor -%}
-      when: 
+      when:
         - ca_etcd | bool
 
     - name: Create CSR
