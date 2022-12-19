@@ -34,6 +34,13 @@
   import_tasks: ca.yml
   when: ca_ca_host == inventory_hostname
 
+- name: Set ca_san to hostname, FQDN, and inventory hostname
+  set_fact:
+    ca_san: >-
+      DNS:{{ ansible_hostname }},
+      DNS:{{ ansible_fqdn }},
+      DNS:{{ inventory_hostname }}
+
 ### client certificate ###
 
 - name: Create key
@@ -54,7 +61,7 @@
     country_name: "{{ ca_country }}"
     organization_name: "{{ ca_organization }}"
     common_name: "{{ inventory_hostname }}"
-    subject_alt_name: "DNS:{{ ansible_hostname }},DNS:{{ ansible_fqdn }},DNS:{{ inventory_hostname }}" # yamllint disable-line rule:line-length
+    subject_alt_name: "{{ ca_san | regex_replace(' ', '') }}"
     extended_key_usage: "{{ extended_key_usage | default(omit) }}"
 
 - name: Pull CSR
@@ -206,3 +213,129 @@
             owner: root
             group: root
             mode: 0600
+
+### etcd peer certificate ###
+
+- name: Create etcd peer certificate
+  when: ca_etcd | bool
+  block:
+
+    - name: Add IP addresses for etcd to ca_san
+      set_fact:
+        ca_san: >-
+          {{ ca_san }},
+          IP:127.0.0.1,
+          {%- for ip in ca_etcd_hosts -%}
+            IP:{{ ip }}
+            {%- if not loop.last -%}
+              ,
+            {%- endif -%}
+          {%- endfor -%}
+      when: 
+        - ca_etcd | bool
+
+    - name: Create CSR
+      openssl_csr:
+        path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.csr"
+        privatekey_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
+        country_name: "{{ ca_country }}"
+        organization_name: "{{ ca_organization }}"
+        common_name: "{{ inventory_hostname }}"
+        subject_alt_name: "{{ ca_san | regex_replace(' ', '') }}"
+        extended_key_usage: "{{ extended_key_usage | default(omit) }}"
+
+    - name: Pull CSR
+      fetch:
+        src: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.csr"
+        dest: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd.csr"
+        flat: true
+
+    - name: Push CSR to CA host
+      copy:
+        src: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd.csr"
+        dest: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd.csr"
+        owner: root
+        group: root
+        mode: 0600
+      delegate_to: "{{ ca_ca_host }}"
+
+    - name: Sign CSR with CA key
+      openssl_certificate:
+        path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd.crt"
+        csr_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd.csr"
+        ownca_path: "{{ ca_ca_dir }}/ca.crt"
+        ownca_privatekey_path: "{{ ca_ca_dir }}/ca.key"
+        ownca_privatekey_passphrase: "{{ ca_ca_password }}"
+        provider: ownca
+      delegate_to: "{{ ca_ca_host }}"
+
+    - name: Fetch certificate
+      fetch:
+        src: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd.crt"
+        dest: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd.crt"
+        flat: true
+      delegate_to: "{{ ca_ca_host }}"
+
+    - name: Push certificate to client
+      copy:
+        src: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd.crt"
+        dest: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.crt"
+        owner: "{{ ca_client_ca_dir_owner }}"
+        group: "{{ ca_client_ca_dir_group }}"
+        mode: "{{ ca_client_ca_dir_mode }}"
+
+### etcd server certificate ###
+
+- name: Create etcd server certificate
+  when: ca_etcd | bool
+  block:
+
+    - name: Create CSR
+      openssl_csr:
+        path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.csr"
+        privatekey_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
+        country_name: "{{ ca_country }}"
+        organization_name: "{{ ca_organization }}"
+        common_name: "{{ inventory_hostname }}"
+        subject_alt_name: "{{ ca_san | regex_replace(' ', '') }}"
+        extended_key_usage: "{{ extended_key_usage | default(omit) }}"
+
+    - name: Pull CSR
+      fetch:
+        src: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.csr"
+        dest: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd-server.csr"
+        flat: true
+
+    - name: Push CSR to CA host
+      copy:
+        src: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd-server.csr"
+        dest: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd-server.csr"
+        owner: root
+        group: root
+        mode: 0600
+      delegate_to: "{{ ca_ca_host }}"
+
+    - name: Sign CSR with CA key
+      openssl_certificate:
+        path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt"
+        csr_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd-server.csr"
+        ownca_path: "{{ ca_ca_dir }}/ca.crt"
+        ownca_privatekey_path: "{{ ca_ca_dir }}/ca.key"
+        ownca_privatekey_passphrase: "{{ ca_ca_password }}"
+        provider: ownca
+      delegate_to: "{{ ca_ca_host }}"
+
+    - name: Fetch certificate
+      fetch:
+        src: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt"
+        dest: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd-server.crt"
+        flat: true
+      delegate_to: "{{ ca_ca_host }}"
+
+    - name: Push certificate to client
+      copy:
+        src: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd-server.crt"
+        dest: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt"
+        owner: "{{ ca_client_ca_dir_owner }}"
+        group: "{{ ca_client_ca_dir_group }}"
+        mode: "{{ ca_client_ca_dir_mode }}"

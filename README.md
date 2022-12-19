@@ -37,6 +37,8 @@ You need to have the Python library `cryptography` in version `>1.2.3` available
 * `ca_ca_keylength`: CA keylength (default: `2048`)
 * `ca_server_cert`: Create server certificate as well (default: `true`)
 * `ca_logstash`: Create Logstash compatible certificate as well. Needs `ca_server_cert` to be set. (default: `false`)
+* `ca_etcd`: Create etcd compatible certificate as well. Needs `ca_etcd_allowed_ip_addresses` to be set. (default: `false`)
+* `ca_etcd_hosts`: List of all IP addresses of each etcd cluster node to allow communication between them. 127.0.0.1 will be added automatically by the role to the SAN for loopback purposes.(default: `undefined`)
 * `ca_keypassphrase`: Password for the client key, default not defined
 * `ca_openssl_cipher`: Cipher to use for key creation, default not defined
 * `ca_client_ca_dir`: Directory to place CA and certificates on the clients (default: `/opt/ca`)
