@@ -33,12 +33,11 @@ You need to have the Python library `cryptography` in version `>1.2.3` available
 * `ca_organizationalunit`: Setting for certificates (default: `example`)
 * `ca_common_name`: CN for certificates (default: `{{ inventory_hostname }}`)
 * `ca_email`: E-Mail address for certificates (default: `root@{{ ansible_fqdn }}`)
-* `ca_san_custom`: Define additional custom SAN (X509v3 Subject Alternative Name) as comma separated list, default not defined
 * `ca_altname_1`: First alt name (default: `{{ ansible_fqdn }}`)
 * `ca_ca_keylength`: CA keylength (default: `2048`)
 * `ca_server_cert`: Create server certificate as well (default: `true`)
 * `ca_logstash`: Create Logstash compatible certificate as well. Needs `ca_server_cert` to be set. (default: `false`)
-* `ca_etcd`: Create etcd compatible certificate as well. Needs `ca_etcd_hosts` to be set. (default: `false`)
+* `ca_etcd`: Create etcd compatible certificate as well. Requires `ca_etcd_hosts` to be defined. (default: `false`)
 * `ca_etcd_hosts`: This variable needs to be a list with all IP addresses of each etcd cluster member to allow communication between them. 127.0.0.1 will be added automatically by the role to the SAN for loopback purposes.(default: `undefined`)
 * `ca_keypassphrase`: Password for the client key, default not defined
 * `ca_openssl_cipher`: Cipher to use for key creation, default not defined
