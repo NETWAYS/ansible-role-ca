@@ -42,3 +42,45 @@
         msg: "Logstash key is missing"
       when:
         - not logstash_key_stat.stat.exists | bool
+
+    - name: Verify signature on etcd peer certificate
+      command: >
+        openssl verify
+        -verbose
+        -CAfile {{ ca_ca_dir }}/ca.crt
+        {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.crt
+
+    - name: Verify signature on etcd server certificate
+      command: >
+        openssl verify
+        -verbose
+        -CAfile {{ ca_ca_dir }}/ca.crt
+        {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt
+
+    - name: Verify signature on etcd server certificate
+      command: >
+        openssl verify
+        -verbose
+        -CAfile {{ ca_ca_dir }}/ca.crt
+        {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt
+
+    - name: Register SAN of etcd peer certificate
+      command: >
+        openssl x509 -text -noout -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.crt
+        -certopt no_subject,no_header,no_version,no_serial,no_signame,no_validity,no_issuer,no_pubkey,no_sigdump,no_aux
+      register: etcd_san_peer_stat
+
+    - name: Register SAN of etcd server certificate
+      command: >
+        openssl x509 -text -noout -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt
+        -certopt no_subject,no_header,no_version,no_serial,no_signame,no_validity,no_issuer,no_pubkey,no_sigdump,no_aux
+      register: etcd_san_peer_stat
+
+    - name: Fail if SAN of etcd peer certificate is miss IP addresses
+      fail:
+        msg: "IP Adresses in etcd peer certifcate are missing"
+      when:
+        - '"IP Address:127.0.0.1" not in etcd_san_peer_stat.stdout'
+        - '"IP Address:172.17.0.2" not in etcd_san_peer_stat.stdout'
+        - '"IP Address:172.17.0.3" not in etcd_san_peer_stat.stdout'
+        - '"IP Address:172.17.0.4" not in etcd_san_peer_stat.stdout'
