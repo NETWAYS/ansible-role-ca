@@ -18,6 +18,7 @@ platforms:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     privileged: true
     pre_build_image: true
+    group: molecule
 provisioner:
   name: ansible
 verifier:

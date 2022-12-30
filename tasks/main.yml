@@ -225,8 +225,8 @@
         ca_san_etcd: >-
           {{ ca_san }},
           IP:127.0.0.1,
-          {%- for ip in ca_etcd_hosts -%}
-            IP:{{ ip }}
+          {%- for host in groups[ca_etcd_group] -%}
+            IP:{{ hostvars[host]['ansible_default_ipv4']['address'] }}
             {%- if not loop.last -%}
               ,
             {%- endif -%}

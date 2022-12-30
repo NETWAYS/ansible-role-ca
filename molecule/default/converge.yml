@@ -9,10 +9,7 @@
     ca_ca_host: ca_default
     ca_logstash: true
     ca_etcd: true
-    ca_etcd_hosts:
-      - 172.17.0.2
-      - 172.17.0.3
-      - 172.17.0.4
+    ca_etcd_group: molecule
   tasks:
     - name: "Include CA role"
       include_role:
