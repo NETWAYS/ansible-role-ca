@@ -46,8 +46,8 @@
 - name: Create key
   openssl_privatekey:
     path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
-    passphrase: "{{ ca_keypassphrase | default(omit) }}"
-    cipher: "{{ ca_openssl_cipher | default(omit) }}"
+    passphrase: "{{ ca_keypassphrase | default(omit, true) }}"
+    cipher: "{{ ca_openssl_cipher | default(omit, true) }}"
     owner: "{{ ca_client_ca_dir_owner }}"
     group: "{{ ca_client_ca_dir_group }}"
     mode: "{{ ca_client_ca_dir_mode }}"
@@ -57,12 +57,12 @@
   openssl_csr:
     path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.csr"
     privatekey_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
-    privatekey_passphrase: "{{ ca_keypassphrase | default(omit) }}"
+    privatekey_passphrase: "{{ ca_keypassphrase | default(omit, true) }}"
     country_name: "{{ ca_country }}"
     organization_name: "{{ ca_organization }}"
     common_name: "{{ inventory_hostname }}"
     subject_alt_name: "{{ ca_san | regex_replace(' ', '') }}"
-    extended_key_usage: "{{ extended_key_usage | default(omit) }}"
+    extended_key_usage: "{{ extended_key_usage | default(omit, true) }}"
 
 - name: Pull CSR
   fetch:
@@ -129,12 +129,12 @@
       openssl_csr:
         path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-server.csr"
         privatekey_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
-        privatekey_passphrase: "{{ ca_keypassphrase | default(omit) }}"
+        privatekey_passphrase: "{{ ca_keypassphrase | default(omit, true) }}"
         country_name: "{{ ca_country }}"
         organization_name: "{{ ca_organization }}"
         common_name: "{{ inventory_hostname }}"
         subject_alt_name: "{{ ca_san | regex_replace(' ', '') }}"
-        extended_key_usage: "{{ extended_key_usage | default(omit) }}"
+        extended_key_usage: "{{ extended_key_usage | default(omit, true) }}"
 
     - name: Pull server CSR
       fetch:
@@ -201,9 +201,9 @@
             openssl pkcs8
             -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}.key
             -topk8
-            -passin pass:{{ ca_keypassphrase | default(omit) }}
+            -passin pass:{{ ca_keypassphrase | default(omit, true) }}
             -out {{ ca_client_ca_dir }}/{{ inventory_hostname }}-pkcs8.key
-            -passout pass:{{ ca_keypassphrase | default(omit) }}
+            -passout pass:{{ ca_keypassphrase | default(omit, true) }}
           args:
             creates: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
 
@@ -242,7 +242,7 @@
         organization_name: "{{ ca_organization }}"
         common_name: "{{ inventory_hostname }}"
         subject_alt_name: "{{ ca_san_etcd | regex_replace(' ', '') }}"
-        extended_key_usage: "{{ extended_key_usage | default(omit) }}"
+        extended_key_usage: "{{ extended_key_usage | default(omit, true) }}"
 
     - name: Pull CSR
       fetch:
@@ -298,7 +298,7 @@
         organization_name: "{{ ca_organization }}"
         common_name: "{{ inventory_hostname }}"
         subject_alt_name: "{{ ca_san_etcd | regex_replace(' ', '') }}"
-        extended_key_usage: "{{ extended_key_usage | default(omit) }}"
+        extended_key_usage: "{{ extended_key_usage | default(omit, true) }}"
 
     - name: Pull CSR
       fetch:
