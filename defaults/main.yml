@@ -14,6 +14,7 @@ ca_ca_host: localhost
 
 ca_server_cert: true
 ca_logstash: false
+ca_etcd: false
 
 ca_country: EX
 ca_state: EX
