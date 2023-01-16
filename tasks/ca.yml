@@ -17,7 +17,7 @@
   block:
 
     - name: Test CA key if present
-      community.crypto.x509_privatekey_info:
+      community.crypto.openssl_privatekey_info:
         path: "{{ ca_ca_dir }}/ca.key"
         passphrase: "{{ ca_ca_password }}"
       register: cakeyinfo

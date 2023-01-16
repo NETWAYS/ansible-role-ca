@@ -37,7 +37,7 @@
 ### client certificate ###
 
 - name: Create key
-  community.crypto.x509_privatekey:
+  community.crypto.openssl_privatekey:
     path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
     passphrase: "{{ ca_keypassphrase | default(omit) }}"
     cipher: "{{ ca_openssl_cipher | default(omit) }}"
@@ -47,7 +47,7 @@
   register: key
 
 - name: Create CSR
-  community.crypto.x509_csr:
+  community.crypto.openssl_csr:
     path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.csr"
     privatekey_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
     privatekey_passphrase: "{{ ca_keypassphrase | default(omit) }}"
@@ -118,7 +118,7 @@
   block:
 
     - name: Create server CSR
-      community.crypto.x509_csr:
+      community.crypto.openssl_csr:
         path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-server.csr"
         privatekey_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
         privatekey_passphrase: "{{ ca_keypassphrase | default(omit) }}"
