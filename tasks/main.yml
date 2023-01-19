@@ -1,7 +1,7 @@
 ---
 
 - name: Ensure CA directory exists on clients
-  file:
+  ansible.builtin.file:
     path: "{{ ca_client_ca_dir }}"
     owner: "{{ ca_client_ca_dir_owner }}"
     group: "{{ ca_client_ca_dir_group }}"
@@ -9,7 +9,7 @@
     state: directory
 
 - name: Ensure CA directory exists
-  file:
+  ansible.builtin.file:
     path: "{{ ca_ca_dir }}"
     owner: root
     group: root
@@ -18,7 +18,7 @@
   delegate_to: "{{ ca_ca_host }}"
 
 - name: Ensure local directory on Ansible host exists
-  file:
+  ansible.builtin.file:
     path: "{{ ca_localdir }}"
     state: directory
     mode: 0700
@@ -26,16 +26,16 @@
   delegate_to: localhost
 
 - name: Install openssl
-  package:
+  ansible.builtin.package:
     name: openssl
   when: ca_manage_openssl | bool
 
 - name: Set up ca
-  import_tasks: ca.yml
+  ansible.builtin.import_tasks: ca.yml
   when: ca_ca_host == inventory_hostname
 
 - name: Set ca_san to hostname, FQDN, and inventory hostname
-  set_fact:
+  ansible.builtin.set_fact:
     ca_san: >-
       DNS:{{ ansible_hostname }},
       DNS:{{ ansible_fqdn }},
@@ -44,7 +44,7 @@
 ### client certificate ###
 
 - name: Create key
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
     passphrase: "{{ ca_keypassphrase | default(omit, true) }}"
     cipher: "{{ ca_openssl_cipher | default(omit, true) }}"
@@ -54,7 +54,7 @@
   register: key
 
 - name: Create CSR
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.csr"
     privatekey_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
     privatekey_passphrase: "{{ ca_keypassphrase | default(omit, true) }}"
@@ -65,13 +65,13 @@
     extended_key_usage: "{{ extended_key_usage | default(omit, true) }}"
 
 - name: Pull CSR
-  fetch:
+  ansible.builtin.fetch:
     src: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.csr"
     dest: "{{ ca_localdir }}/{{ inventory_hostname }}.csr"
     flat: true
 
 - name: Push CSR to CA host
-  copy:
+  ansible.builtin.copy:
     src: "{{ ca_localdir }}/{{ inventory_hostname }}.csr"
     dest: "{{ ca_ca_dir }}/{{ inventory_hostname }}.csr"
     owner: root
@@ -80,7 +80,7 @@
   delegate_to: "{{ ca_ca_host }}"
 
 - name: Sign CSR with CA key
-  openssl_certificate:
+  community.crypto.x509_certificate:
     path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.crt"
     csr_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.csr"
     ownca_path: "{{ ca_ca_dir }}/ca.crt"
@@ -90,14 +90,14 @@
   delegate_to: "{{ ca_ca_host }}"
 
 - name: Fetch certificate
-  fetch:
+  ansible.builtin.fetch:
     src: "{{ ca_ca_dir }}/{{ inventory_hostname }}.crt"
     dest: "{{ ca_localdir }}/{{ inventory_hostname }}.crt"
     flat: true
   delegate_to: "{{ ca_ca_host }}"
 
 - name: Push certificate to client
-  copy:
+  ansible.builtin.copy:
     src: "{{ ca_localdir }}/{{ inventory_hostname }}.crt"
     dest: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.crt"
     owner: "{{ ca_client_ca_dir_owner }}"
@@ -105,14 +105,14 @@
     mode: "{{ ca_client_ca_dir_mode }}"
 
 - name: Fetch CA certificate
-  fetch:
+  ansible.builtin.fetch:
     src: "{{ ca_ca_dir }}/ca.crt"
     dest: "{{ ca_localdir }}/ca.crt"
     flat: true
   delegate_to: "{{ ca_ca_host }}"
 
 - name: Push CA certificate to client
-  copy:
+  ansible.builtin.copy:
     src: "{{ ca_localdir }}/ca.crt"
     dest: "{{ ca_client_ca_dir }}/ca.crt"
     owner: "{{ ca_client_ca_dir_owner }}"
@@ -126,7 +126,7 @@
   block:
 
     - name: Create server CSR
-      openssl_csr:
+      community.crypto.openssl_csr:
         path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-server.csr"
         privatekey_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
         privatekey_passphrase: "{{ ca_keypassphrase | default(omit, true) }}"
@@ -137,13 +137,13 @@
         extended_key_usage: "{{ extended_key_usage | default(omit, true) }}"
 
     - name: Pull server CSR
-      fetch:
+      ansible.builtin.fetch:
         src: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-server.csr"
         dest: "{{ ca_localdir }}/{{ inventory_hostname }}-server.csr"
         flat: true
 
     - name: Push server CSR to CA host
-      copy:
+      ansible.builtin.copy:
         src: "{{ ca_localdir }}/{{ inventory_hostname }}-server.csr"
         dest: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.csr"
         owner: root
@@ -152,7 +152,7 @@
       delegate_to: "{{ ca_ca_host }}"
 
     - name: Sign server CSR with CA key
-      openssl_certificate:
+      community.crypto.x509_certificate:
         path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.crt"
         csr_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.csr"
         ownca_path: "{{ ca_ca_dir }}/ca.crt"
@@ -162,14 +162,14 @@
       delegate_to: "{{ ca_ca_host }}"
 
     - name: Fetch server certificate
-      fetch:
+      ansible.builtin.fetch:
         src: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.crt"
         dest: "{{ ca_localdir }}/{{ inventory_hostname }}-server.crt"
         flat: true
       delegate_to: "{{ ca_ca_host }}"
 
     - name: Push server certificate to client
-      copy:
+      ansible.builtin.copy:
         src: "{{ ca_localdir }}/{{ inventory_hostname }}-server.crt"
         dest: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-server.crt"
         owner: "{{ ca_client_ca_dir_owner }}"
@@ -181,12 +181,12 @@
       block:
 
         - name: Check if Logstash key is present
-          stat:
+          ansible.builtin.stat:
             path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
           register: key_stat
 
         - name: Move old Logstash key if common key was replaced
-          command: >
+          ansible.builtin.command: >
             mv
             {{ ca_client_ca_dir }}/{{ inventory_hostname }}-pkcs8.key
             {{ ca_client_ca_dir }}/\
@@ -197,7 +197,7 @@
             - key.changed | bool
 
         - name: Create Logstash compatible key
-          command: >
+          ansible.builtin.command: >
             openssl pkcs8
             -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}.key
             -topk8
@@ -208,7 +208,7 @@
             creates: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
 
         - name: Set permissions on Logstash key
-          file:
+          ansible.builtin.file:
             path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
             owner: root
             group: root
@@ -221,7 +221,7 @@
   block:
 
     - name: Add IP addresses for etcd to ca_san_etcd
-      set_fact:
+      ansible.builtin.set_fact:
         ca_san_etcd: >-
           {{ ca_san }},
           IP:127.0.0.1,
@@ -235,7 +235,7 @@
         - ca_etcd | bool
 
     - name: Create CSR
-      openssl_csr:
+      community.crypto.openssl_csr:
         path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.csr"
         privatekey_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
         country_name: "{{ ca_country }}"
@@ -245,13 +245,13 @@
         extended_key_usage: "{{ extended_key_usage | default(omit, true) }}"
 
     - name: Pull CSR
-      fetch:
+      ansible.builtin.fetch:
         src: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.csr"
         dest: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd.csr"
         flat: true
 
     - name: Push CSR to CA host
-      copy:
+      ansible.builtin.copy:
         src: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd.csr"
         dest: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd.csr"
         owner: root
@@ -260,7 +260,7 @@
       delegate_to: "{{ ca_ca_host }}"
 
     - name: Sign CSR with CA key
-      openssl_certificate:
+      community.crypto.x509_certificate:
         path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd.crt"
         csr_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd.csr"
         ownca_path: "{{ ca_ca_dir }}/ca.crt"
@@ -270,14 +270,14 @@
       delegate_to: "{{ ca_ca_host }}"
 
     - name: Fetch certificate
-      fetch:
+      ansible.builtin.fetch:
         src: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd.crt"
         dest: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd.crt"
         flat: true
       delegate_to: "{{ ca_ca_host }}"
 
     - name: Push certificate to client
-      copy:
+      ansible.builtin.copy:
         src: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd.crt"
         dest: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.crt"
         owner: "{{ ca_client_ca_dir_owner }}"
@@ -291,7 +291,7 @@
   block:
 
     - name: Create CSR
-      openssl_csr:
+      community.crypto.openssl_csr:
         path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.csr"
         privatekey_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
         country_name: "{{ ca_country }}"
@@ -301,13 +301,13 @@
         extended_key_usage: "{{ extended_key_usage | default(omit, true) }}"
 
     - name: Pull CSR
-      fetch:
+      ansible.builtin.fetch:
         src: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.csr"
         dest: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd-server.csr"
         flat: true
 
     - name: Push CSR to CA host
-      copy:
+      ansible.builtin.copy:
         src: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd-server.csr"
         dest: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd-server.csr"
         owner: root
@@ -316,7 +316,7 @@
       delegate_to: "{{ ca_ca_host }}"
 
     - name: Sign CSR with CA key
-      openssl_certificate:
+      community.crypto.x509_certificate:
         path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt"
         csr_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd-server.csr"
         ownca_path: "{{ ca_ca_dir }}/ca.crt"
@@ -326,14 +326,14 @@
       delegate_to: "{{ ca_ca_host }}"
 
     - name: Fetch certificate
-      fetch:
+      ansible.builtin.fetch:
         src: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt"
         dest: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd-server.crt"
         flat: true
       delegate_to: "{{ ca_ca_host }}"
 
     - name: Push certificate to client
-      copy:
+      ansible.builtin.copy:
         src: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd-server.crt"
         dest: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt"
         owner: "{{ ca_client_ca_dir_owner }}"
