@@ -31,7 +31,7 @@
   when: ca_manage_openssl | bool
 
 - name: Set up ca
-  import_tasks: ca.yml
+  ansible.builtin.import_tasks: ca.yml
   when: ca_ca_host == inventory_hostname
 
 - name: Set ca_san to hostname, FQDN, and inventory hostname
