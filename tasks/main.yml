@@ -245,7 +245,7 @@
         extended_key_usage: "{{ extended_key_usage | default(omit, true) }}"
 
     - name: Pull CSR
-      iansible.builtin.fetch:
+      ansible.builtin.fetch:
         src: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.csr"
         dest: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd.csr"
         flat: true
