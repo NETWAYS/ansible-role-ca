@@ -35,7 +35,7 @@
   when: ca_ca_host == inventory_hostname
 
 - name: Set ca_san to hostname, FQDN, and inventory hostname
-  set_fact:
+  ansible.builtin.set_fact:
     ca_san: >-
       DNS:{{ ansible_hostname }},
       DNS:{{ ansible_fqdn }},
@@ -221,7 +221,7 @@
   block:
 
     - name: Add IP addresses for etcd to ca_san_etcd
-      set_fact:
+      ansible.builtin.set_fact:
         ca_san_etcd: >-
           {{ ca_san }},
           IP:127.0.0.1,
@@ -235,7 +235,7 @@
         - ca_etcd | bool
 
     - name: Create CSR
-      openssl_csr:
+      community.crypto.openssl_csr:
         path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.csr"
         privatekey_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
         country_name: "{{ ca_country }}"
@@ -245,13 +245,13 @@
         extended_key_usage: "{{ extended_key_usage | default(omit, true) }}"
 
     - name: Pull CSR
-      fetch:
+      iansible.builtin.fetch:
         src: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.csr"
         dest: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd.csr"
         flat: true
 
     - name: Push CSR to CA host
-      copy:
+      ansible.builtin.copy:
         src: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd.csr"
         dest: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd.csr"
         owner: root
@@ -260,7 +260,7 @@
       delegate_to: "{{ ca_ca_host }}"
 
     - name: Sign CSR with CA key
-      openssl_certificate:
+      community.crypto.x509_certificate:
         path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd.crt"
         csr_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd.csr"
         ownca_path: "{{ ca_ca_dir }}/ca.crt"
@@ -270,14 +270,14 @@
       delegate_to: "{{ ca_ca_host }}"
 
     - name: Fetch certificate
-      fetch:
+      ansible.builtin.fetch:
         src: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd.crt"
         dest: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd.crt"
         flat: true
       delegate_to: "{{ ca_ca_host }}"
 
     - name: Push certificate to client
-      copy:
+      ansible.builtin.copy:
         src: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd.crt"
         dest: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.crt"
         owner: "{{ ca_client_ca_dir_owner }}"
@@ -291,7 +291,7 @@
   block:
 
     - name: Create CSR
-      openssl_csr:
+      community.crypto.openssl_csr:
         path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.csr"
         privatekey_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
         country_name: "{{ ca_country }}"
@@ -301,13 +301,13 @@
         extended_key_usage: "{{ extended_key_usage | default(omit, true) }}"
 
     - name: Pull CSR
-      fetch:
+      ansible.builtin.fetch:
         src: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.csr"
         dest: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd-server.csr"
         flat: true
 
     - name: Push CSR to CA host
-      copy:
+      ansible.builtin.copy:
         src: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd-server.csr"
         dest: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd-server.csr"
         owner: root
@@ -316,7 +316,7 @@
       delegate_to: "{{ ca_ca_host }}"
 
     - name: Sign CSR with CA key
-      openssl_certificate:
+      community.crypto.x509_certificate:
         path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt"
         csr_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd-server.csr"
         ownca_path: "{{ ca_ca_dir }}/ca.crt"
@@ -326,14 +326,14 @@
       delegate_to: "{{ ca_ca_host }}"
 
     - name: Fetch certificate
-      fetch:
+      ansible.builtin.fetch:
         src: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt"
         dest: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd-server.crt"
         flat: true
       delegate_to: "{{ ca_ca_host }}"
 
     - name: Push certificate to client
-      copy:
+      ansible.builtin.copy:
         src: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd-server.crt"
         dest: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt"
         owner: "{{ ca_client_ca_dir_owner }}"
