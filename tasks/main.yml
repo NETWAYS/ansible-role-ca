@@ -138,7 +138,7 @@
     backup: true
     provider: ownca
   delegate_to: "{{ ca_ca_host }}"
-  when: not result.valid_at.point_1
+  when: not expire.valid_at.point_1
 ### server certificate ###
 
 - name: Create server certificate
