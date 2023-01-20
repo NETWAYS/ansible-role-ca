@@ -42,7 +42,7 @@
       DNS:{{ inventory_hostname }}
 - name: Verify certificates validation
     community.crypto.x509_certificate_info:
-    path: /etc/ssl/crt/ansible.com.crt
+    path: "{{ ca_client_ca_dir }}"
     valid_at:
       point_1: "{{ ca_check_valid_time }}"
   register: expire
