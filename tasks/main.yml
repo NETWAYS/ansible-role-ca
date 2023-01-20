@@ -40,8 +40,9 @@
       DNS:{{ ansible_hostname }},
       DNS:{{ ansible_fqdn }},
       DNS:{{ inventory_hostname }}
+
 - name: Verify certificates validation
-    community.crypto.x509_certificate_info:
+  community.crypto.x509_certificate_info:
     path: "{{ ca_client_ca_dir }}"
     valid_at:
       point_1: "{{ ca_check_valid_time }}"
