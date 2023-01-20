@@ -43,7 +43,7 @@
 
 - name: Verify certificates validation
   community.crypto.x509_certificate_info:
-    path: "{{ ca_client_ca_dir }}"
+    path: "{{ ca_client_ca_dir }}/ca.crt"
     valid_at:
       point_1: "{{ ca_check_valid_time }}"
   register: expire
