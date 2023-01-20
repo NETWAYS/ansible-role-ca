@@ -41,25 +41,6 @@
       DNS:{{ ansible_fqdn }},
       DNS:{{ inventory_hostname }}
 
-- name: Verify certificates validation
-  community.crypto.x509_certificate_info:
-    path: "{{ ca_client_ca_dir }}/ca.crt"
-    valid_at:
-      point_1: "{{ ca_check_valid_time }}"
-  register: expire
-
-- name: Resign CSR with CA key
-  community.crypto.x509_certificate:
-    path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.crt"
-    csr_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.csr"
-    ownca_path: "{{ ca_ca_dir }}/ca.crt"
-    ownca_privatekey_path: "{{ ca_ca_dir }}/ca.key"
-    ownca_privatekey_passphrase: "{{ ca_ca_password }}"
-    ownca_not_after: "{{ ca_valid_time }}"
-    backup: true
-    provider: ownca
-  delegate_to: "{{ ca_ca_host }}"
-  when: not result.valid_at.point_1
 ### client certificate ###
 
 - name: Create key
@@ -139,6 +120,25 @@
     group: "{{ ca_client_ca_dir_group }}"
     mode: "{{ ca_client_ca_dir_mode }}"
 
+- name: Verify certificates validation
+  community.crypto.x509_certificate_info:
+    path: "{{ ca_client_ca_dir }}/ca.crt"
+    valid_at:
+      point_1: "{{ ca_check_valid_time }}"
+  register: expire
+
+- name: Resign CSR with CA key
+  community.crypto.x509_certificate:
+    path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.crt"
+    csr_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.csr"
+    ownca_path: "{{ ca_ca_dir }}/ca.crt"
+    ownca_privatekey_path: "{{ ca_ca_dir }}/ca.key"
+    ownca_privatekey_passphrase: "{{ ca_ca_password }}"
+    ownca_not_after: "{{ ca_valid_time }}"
+    backup: true
+    provider: ownca
+  delegate_to: "{{ ca_ca_host }}"
+  when: not result.valid_at.point_1
 ### server certificate ###
 
 - name: Create server certificate
