@@ -7,6 +7,8 @@ ca_client_ca_dir_owner: root
 ca_client_ca_dir_group: root
 ca_client_ca_dir_mode: 0700
 ca_ca_days: 3650
+ca_valid_time: +90d
+ca_check_valid_time: +1d
 ca_ca_password: ChangeMe
 ca_localdir: /tmp/ca
 ca_local_become: false
