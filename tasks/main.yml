@@ -79,7 +79,23 @@
     mode: 0600
   delegate_to: "{{ ca_ca_host }}"
 
-- name: Sign CSR with CA key
+- name: Check if client certificate exists
+  ansible.builtin.stat:
+    path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.crt"
+  register: client_certificate
+  when: ca_renew | bool
+
+- name: Verify client certificate will not expire soon
+  community.crypto.x509_certificate_info:
+    path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.crt"
+    valid_at:
+      check_period: "{{ ca_check_valid_time }}"
+  register: client_expire
+  when:
+    - ca_renew | bool
+    - client_certificate.stat.exists | bool
+
+- name: (Re)sign CSR with CA key
   community.crypto.x509_certificate:
     path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.crt"
     csr_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.csr"
@@ -88,6 +104,10 @@
     ownca_privatekey_passphrase: "{{ ca_ca_password }}"
     ownca_not_after: "{{ ca_valid_time }}"
     provider: ownca
+    force:
+      "{{ not client_expire.valid_at.check_period | default(omit) or
+      hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
+    backup: true
   delegate_to: "{{ ca_ca_host }}"
 
 - name: Fetch certificate
@@ -120,25 +140,6 @@
     group: "{{ ca_client_ca_dir_group }}"
     mode: "{{ ca_client_ca_dir_mode }}"
 
-- name: Verify certificates validation
-  community.crypto.x509_certificate_info:
-    path: "{{ ca_client_ca_dir }}/ca.crt"
-    valid_at:
-      point_1: "{{ ca_check_valid_time }}"
-  register: expire
-
-- name: Resign CSR with CA key
-  community.crypto.x509_certificate:
-    path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.crt"
-    csr_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.csr"
-    ownca_path: "{{ ca_ca_dir }}/ca.crt"
-    ownca_privatekey_path: "{{ ca_ca_dir }}/ca.key"
-    ownca_privatekey_passphrase: "{{ ca_ca_password }}"
-    ownca_not_after: "{{ ca_valid_time }}"
-    backup: true
-    provider: ownca
-  delegate_to: "{{ ca_ca_host }}"
-  when: not expire.valid_at.point_1
 ### server certificate ###
 
 - name: Create server certificate
@@ -171,14 +172,33 @@
         mode: 0600
       delegate_to: "{{ ca_ca_host }}"
 
-    - name: Sign server CSR with CA key
+    - name: Check if server certificate exists
+      ansible.builtin.stat:
+        path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.crt"
+      register: server_certificate
+      when: ca_renew | bool
+
+    - name: Verify server certificate will not expire soon
+      community.crypto.x509_certificate_info:
+        path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.crt"
+        valid_at:
+          check_period: "{{ ca_check_valid_time }}"
+      register: server_expire
+      when:
+        - ca_renew | bool
+        - server_certificate.stat.exists | bool
+
+    - name: (Re)sign server CSR with CA key
       community.crypto.x509_certificate:
         path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.crt"
         csr_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.csr"
         ownca_path: "{{ ca_ca_dir }}/ca.crt"
         ownca_privatekey_path: "{{ ca_ca_dir }}/ca.key"
         ownca_privatekey_passphrase: "{{ ca_ca_password }}"
+        ownca_not_after: "{{ ca_valid_time }}"
         provider: ownca
+        force: "{{ not server_expire.valid_at.check_period | default(omit) or hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
+        backup: true
       delegate_to: "{{ ca_ca_host }}"
 
     - name: Fetch server certificate
@@ -279,14 +299,33 @@
         mode: 0600
       delegate_to: "{{ ca_ca_host }}"
 
-    - name: Sign CSR with CA key
+    - name: Check if etcd peer certificate exists
+      ansible.builtin.stat:
+        path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd.crt"
+      register: etcd_peer_certificate
+      when: ca_renew | bool
+
+    - name: Verify etcd peer certificate will not expire soon
+      community.crypto.x509_certificate_info:
+        path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd.crt"
+        valid_at:
+          check_period: "{{ ca_check_valid_time }}"
+      register: etcd_peer_expire
+      when:
+        - ca_renew | bool
+        - etcd_peer_certificate.stat.exists | bool
+
+    - name: (Re)sign CSR with CA key
       community.crypto.x509_certificate:
         path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd.crt"
         csr_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd.csr"
         ownca_path: "{{ ca_ca_dir }}/ca.crt"
         ownca_privatekey_path: "{{ ca_ca_dir }}/ca.key"
         ownca_privatekey_passphrase: "{{ ca_ca_password }}"
+        ownca_not_after: "{{ ca_valid_time }}"
         provider: ownca
+        force: "{{ not etcd_peer_expire.valid_at.check_period | default(omit) or hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
+        backup: true
       delegate_to: "{{ ca_ca_host }}"
 
     - name: Fetch certificate
@@ -335,14 +374,33 @@
         mode: 0600
       delegate_to: "{{ ca_ca_host }}"
 
-    - name: Sign CSR with CA key
+    - name: Check if etcd server certificate exists
+      ansible.builtin.stat:
+        path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt"
+      register: etcd_server_certificate
+      when: ca_renew | bool
+
+    - name: Verify etcd server certificate will not expire soon
+      community.crypto.x509_certificate_info:
+        path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt"
+        valid_at:
+          check_period: "{{ ca_check_valid_time }}"
+      register: etcd_server_expire
+      when:
+        - ca_renew | bool
+        - etcd_server_certificate.stat.exists | bool
+
+    - name: (Re)sign CSR with CA key
       community.crypto.x509_certificate:
         path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt"
         csr_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd-server.csr"
         ownca_path: "{{ ca_ca_dir }}/ca.crt"
         ownca_privatekey_path: "{{ ca_ca_dir }}/ca.key"
         ownca_privatekey_passphrase: "{{ ca_ca_password }}"
+        ownca_not_after: "{{ ca_valid_time }}"
         provider: ownca
+        force: "{{ not etcd_server_expire.valid_at.check_period | default(omit) or hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
+        backup: true
       delegate_to: "{{ ca_ca_host }}"
 
     - name: Fetch certificate
