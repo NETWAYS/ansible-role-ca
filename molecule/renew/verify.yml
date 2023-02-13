@@ -102,7 +102,7 @@
     - name: Fail if notAfter of client certificate is not next year
       fail:
         msg: "Failed because notAfter of client certificate is not next year"
-      when:  next_year | string not in client_crt_stat.stdout
+      when: next_year | string not in client_crt_stat.stdout
 
     - name: Register notAfter of server certificate
       shell: >
