@@ -63,7 +63,7 @@
       ansible.builtin.stat:
         path: "{{ ca_ca_dir }}/ca.crt"
       register: ca_certificate
- 
+
     - name: Verify CA certificate will not expire soon
       community.crypto.x509_certificate_info:
         path: "{{ ca_ca_dir }}/ca.crt"
@@ -71,7 +71,7 @@
           check_period: "{{ ca_check_valid_time }}"
       register: ca_expire
       when: ca_certificate.stat.exists | bool
- 
+
     - name: Rotate expiring CA certificate
       ansible.builtin.command: >
         mv
@@ -80,7 +80,7 @@
       when:
         - ca_certificate.stat.exists | bool
         - not ca_expire.valid_at.check_period | bool
- 
+
     - name: Set ca_ca_renewed variable
       ansible.builtin.set_fact:
         ca_ca_renewed: "{{ not ca_expire.valid_at.check_period }}"
