@@ -66,13 +66,19 @@
 
     - name: Register SAN of etcd peer certificate
       command: >
-        openssl x509 -text -noout -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.crt
+        openssl x509
+        -text
+        -noout
+        -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.crt
         -certopt no_subject,no_header,no_version,no_serial,no_signame,no_validity,no_issuer,no_pubkey,no_sigdump,no_aux
       register: etcd_san_peer_stat
 
     - name: Register SAN of etcd server certificate
       command: >
-        openssl x509 -text -noout -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt
+        openssl x509
+        -text
+        -noout
+        -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt
         -certopt no_subject,no_header,no_version,no_serial,no_signame,no_validity,no_issuer,no_pubkey,no_sigdump,no_aux
       register: etcd_san_server_stat
 
@@ -80,14 +86,16 @@
       fail:
         msg: "Default IPv4 address in etcd peer certifcate are missing"
       when:
-        - hostvars['ca_default_client']['ansible_default_ipv4']['address'] not in etcd_san_peer_stat.stdout
+        - hostvars['ca_default_client']['ansible_default_ipv4']['address']
+          not in etcd_san_peer_stat.stdout
         - '"127.0.0.1" not in etcd_san_peer_stat.stdout'
 
     - name: Fail if SAN of etcd server certificate is missing loopback or default IP address
       fail:
         msg: "Default IPv4 address in etcd server certifcate are missing"
       when:
-        - hostvars['ca_default_client']['ansible_default_ipv4']['address'] not in etcd_san_server_stat.stdout
+        - hostvars['ca_default_client']['ansible_default_ipv4']['address']
+          not in etcd_san_server_stat.stdout
         - '"127.0.0.1" not in etcd_san_server_stat.stdout'
 
     - name: Get next year
@@ -96,7 +104,11 @@
 
     - name: Register notAfter of client certificate
       shell: >
-        openssl x509 -noout -dates -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}.crt | grep notAfter
+        openssl x509
+        -noout
+        -dates
+        -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}.crt
+        | grep notAfter
       register: client_crt_stat
 
     - name: Fail if notAfter of client certificate is not next year
@@ -106,7 +118,11 @@
 
     - name: Register notAfter of server certificate
       shell: >
-        openssl x509 -noout -dates -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}-server.crt | grep notAfter
+        openssl x509
+        -noout
+        -dates
+        -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}-server.crt
+        | grep notAfter
       register: server_crt_stat
 
     - name: Fail if notAfter of server certificate is not next year
@@ -116,7 +132,11 @@
 
     - name: Register notAfter of etcd certificate
       shell: >
-        openssl x509 -noout -dates -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.crt | grep notAfter
+        openssl x509
+        -noout
+        -dates
+        -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.crt
+        | grep notAfter
       register: etcd_crt_stat
 
     - name: Fail if notAfter of etcd certificate is not next year
@@ -126,7 +146,11 @@
 
     - name: Register notAfter of etcd server certificate
       shell: >
-        openssl x509 -noout -dates -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt | grep notAfter
+        openssl x509
+        -noout
+        -dates
+        -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt
+        | grep notAfter
       register: etcd_server_crt_stat
 
     - name: Fail if notAfter of etcd server certificate is not next year
@@ -134,16 +158,17 @@
         msg: "Failed because notAfter of etcd server certificate is not next year"
       when:  next_year | string not in etcd_server_crt_stat.stdout
 
-    # CAUTION
-    # Can be +-3 days, so if pipelines runs at
-    # end or beginning of the year it can fail
     - name: Get year of next decade to check CA
       set_fact:
         next_decade: "{{ ( ansible_date_time.date.split('-')[0] | int ) +10 }}"
 
     - name: Register notAfter of CA certificate
       shell: >
-        openssl x509 -noout -dates -in {{ ca_client_ca_dir }}/ca.crt | grep notAfter
+        openssl x509
+        -noout
+        -dates
+        -in {{ ca_client_ca_dir }}/ca.crt
+        | grep notAfter
       register: ca_crt_stat
 
     - name: Fail if notAfter of CA certificate is not next decade
