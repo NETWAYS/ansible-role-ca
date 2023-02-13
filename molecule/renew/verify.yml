@@ -66,7 +66,10 @@
 
     - name: Register SAN of etcd peer certificate
       command: >
-        openssl x509 -text -noout -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.crt
+        openssl x509
+        -text
+        -noout
+        -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.crt
         -certopt no_subject,no_header,no_version,no_serial,no_signame,no_validity,no_issuer,no_pubkey,no_sigdump,no_aux
       register: etcd_san_peer_stat
 
