@@ -55,38 +55,36 @@
   args:
     creates: "{{ ca_ca_dir }}/ca.key"
 
-- name: Check if CA certificate exists
-  ansible.builtin.stat:
-    path: "{{ ca_ca_dir }}/ca.crt"
-  register: ca_certificate
-  when: ca_renew | bool
+- name: Renew CA Certificate
+  when: ca_renew | bool 
+  block:
 
-- name: Verify CA certificate will not expire soon
-  community.crypto.x509_certificate_info:
-    path: "{{ ca_ca_dir }}/ca.crt"
-    valid_at:
-      check_period: "{{ ca_check_valid_time }}"
-  register: ca_expire
-  when:
-    - ca_renew | bool
-    - ca_certificate.stat.exists | bool
-
-- name: Rotate expiring CA certificate
-  ansible.builtin.command: >
-    mv
-    {{ ca_ca_dir }}/ca.crt
-    {{ ca_ca_dir }}/ca.crt.{{ ansible_date_time.iso8601 }}
-  when:
-    - ca_renew | bool
-    - ca_certificate.stat.exists | bool
-    - not ca_expire.valid_at.check_period | bool
-
-- name: Set ca_ca_renewed variable
-  ansible.builtin.set_fact:
-    ca_ca_renewed: "{{ not ca_expire.valid_at.check_period }}"
-  when:
-    - ca_renew | bool
-    - ca_certificate.stat.exists | bool
+    - name: Check if CA certificate exists
+      ansible.builtin.stat:
+        path: "{{ ca_ca_dir }}/ca.crt"
+      register: ca_certificate
+    
+    - name: Verify CA certificate will not expire soon
+      community.crypto.x509_certificate_info:
+        path: "{{ ca_ca_dir }}/ca.crt"
+        valid_at:
+          check_period: "{{ ca_check_valid_time }}"
+      register: ca_expire
+      when: ca_certificate.stat.exists | bool
+    
+    - name: Rotate expiring CA certificate
+      ansible.builtin.command: >
+        mv
+        {{ ca_ca_dir }}/ca.crt
+        {{ ca_ca_dir }}/ca.crt.{{ ansible_date_time.iso8601 }}
+      when:
+        - ca_certificate.stat.exists | bool
+        - not ca_expire.valid_at.check_period | bool
+    
+    - name: Set ca_ca_renewed variable
+      ansible.builtin.set_fact:
+        ca_ca_renewed: "{{ not ca_expire.valid_at.check_period }}"
+      when: ca_certificate.stat.exists | bool
 
 - name: Generate CA certificate
   ansible.builtin.command: >
