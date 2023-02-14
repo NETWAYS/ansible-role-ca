@@ -55,8 +55,6 @@
   args:
     creates: "{{ ca_ca_dir }}/ca.key"
 
-
-
 - name: Renew CA certificate
   when: ca_renew | bool
   block:
