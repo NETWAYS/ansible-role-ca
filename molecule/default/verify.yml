@@ -64,23 +64,41 @@
         -CAfile {{ ca_ca_dir }}/ca.crt
         {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt
 
-    # TODO line-length
     - name: Register SAN of etcd peer certificate
       command: >
         openssl x509
         -text -noout
         -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.crt
-        -certopt no_subject,no_header,no_version,no_serial,no_signame,no_validity,no_issuer,no_pubkey,no_sigdump,no_aux
+        -certopt "
+        no_subject,
+        no_header,
+        no_version,
+        no_serial,
+        no_signame,
+        no_validity,
+        no_issuer,
+        no_pubkey,
+        no_sigdump,
+        no_aux"
       register: etcd_san_peer_stat
 
-    # TODO line-length
     - name: Register SAN of etcd server certificate
       command: >
         openssl x509
         -text
         -noout
         -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt
-        -certopt no_subject,no_header,no_version,no_serial,no_signame,no_validity,no_issuer,no_pubkey,no_sigdump,no_aux
+        -certopt "
+        no_subject,
+        no_header,
+        no_version,
+        no_serial,
+        no_signame,
+        no_validity,
+        no_issuer,
+        no_pubkey,
+        no_sigdump,
+        no_aux"
       register: etcd_san_server_stat
 
     - name: Fail if SAN of etcd peer certificate is missing IP addresses
