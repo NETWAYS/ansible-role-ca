@@ -64,7 +64,6 @@
         -CAfile {{ ca_ca_dir }}/ca.crt
         {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt
 
-    # TODO line-length
     - name: Register SAN of etcd peer certificate
       command: >
         openssl x509
