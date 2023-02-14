@@ -82,7 +82,7 @@
 - name: Check if client certificate has to be renewed
   ansible.builtin.import_tasks: renew.yml
   vars:
-    certificate_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.crt"
+    crt_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.crt"
   when: ca_renew | bool
 
 - name: (Re)sign CSR with CA key
@@ -165,7 +165,7 @@
     - name: Check if server certificate has to be renewed
       ansible.builtin.import_tasks: renew.yml
       vars:
-        certificate_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.crt"
+        crt_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.crt"
       when: ca_renew | bool
 
     - name: (Re)sign server CSR with CA key
@@ -284,7 +284,7 @@
     - name: Check if etcd peer certificate has to be renewed
       ansible.builtin.import_tasks: renew.yml
       vars:
-        certificate_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd.crt"
+        crt_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd.crt"
       when: ca_renew | bool
 
     - name: (Re)sign CSR with CA key
@@ -351,7 +351,7 @@
     - name: Check if etcd server certificate has to be renewed
       ansible.builtin.import_tasks: renew.yml
       vars:
-        certificate_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt"
+        crt_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt"
       when: ca_renew | bool
 
     - name: (Re)sign CSR with CA key

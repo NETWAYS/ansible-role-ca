@@ -2,14 +2,14 @@
 
 - name: Ensure certificate exists
   ansible.builtin.stat:
-    path: "{{ certificate_path }}"
-  register: certificate_exists
+    path: "{{ crt_path }}"
+  register: crt_exists
 
 - name: Verify client certificate will not expire soon
   community.crypto.x509_certificate_info:
-    path: "{{ certificate_path }}"
+    path: "{{ crt_path }}"
     valid_at:
       check_period: "{{ ca_check_valid_time }}"
-  register: certificate_info
+  register: crt_info
   when:
-    - certificate_exists.stat.exists | bool
+    - crt_exists.stat.exists | bool
