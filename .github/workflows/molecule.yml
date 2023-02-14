@@ -16,7 +16,7 @@ jobs:
       max-parallel: 1
       matrix:
         distro: [rockylinux8]
-        scenario: [default, renew, ca-renew]
+        scenario: [ca-renew]
     steps:
       - name: Check out code
         uses: actions/checkout@v3

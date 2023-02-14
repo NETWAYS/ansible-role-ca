@@ -1,0 +1,15 @@
+---
+
+- name: Ensure certificate exists
+  ansible.builtin.stat:
+    path: "{{ certificate_path }}"
+  register: certificate_exists
+
+- name: Verify client certificate will not expire soon
+  community.crypto.x509_certificate_info:
+    path: "{{ certificate_path }}"
+    valid_at:
+      check_period: "{{ ca_check_valid_time }}"
+  register: certificate_info
+  when:
+    - certificate_exists.stat.exists | bool

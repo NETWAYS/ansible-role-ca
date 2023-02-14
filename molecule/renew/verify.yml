@@ -64,6 +64,7 @@
         -CAfile {{ ca_ca_dir }}/ca.crt
         {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt
 
+    # TODO line-length
     - name: Register SAN of etcd peer certificate
       command: >
         openssl x509
@@ -73,6 +74,7 @@
         -certopt no_subject,no_header,no_version,no_serial,no_signame,no_validity,no_issuer,no_pubkey,no_sigdump,no_aux
       register: etcd_san_peer_stat
 
+    # TODO line-length
     - name: Register SAN of etcd server certificate
       command: >
         openssl x509
@@ -82,7 +84,7 @@
         -certopt no_subject,no_header,no_version,no_serial,no_signame,no_validity,no_issuer,no_pubkey,no_sigdump,no_aux
       register: etcd_san_server_stat
 
-    - name: Fail if SAN of etcd peer certificate is missing loopback or default IP address
+    - name: Fail if SAN of etcd peer certificate is missing addresses
       fail:
         msg: "Default IPv4 address in etcd peer certifcate are missing"
       when:
@@ -90,7 +92,7 @@
           not in etcd_san_peer_stat.stdout
         - '"127.0.0.1" not in etcd_san_peer_stat.stdout'
 
-    - name: Fail if SAN of etcd server certificate is missing loopback or default IP address
+    - name: Fail if SAN of etcd server certificate is missing IP addresses
       fail:
         msg: "Default IPv4 address in etcd server certifcate are missing"
       when:
@@ -128,7 +130,7 @@
     - name: Fail if notAfter of server certificate is not next year
       fail:
         msg: "Failed because notAfter of server certificate is not next year"
-      when:  next_year | string not in server_crt_stat.stdout
+      when: next_year | string not in server_crt_stat.stdout
 
     - name: Register notAfter of etcd certificate
       shell: >
@@ -142,7 +144,7 @@
     - name: Fail if notAfter of etcd certificate is not next year
       fail:
         msg: "Failed because notAfter of etcd certificate is not next year"
-      when:  next_year | string not in etcd_crt_stat.stdout
+      when: next_year | string not in etcd_crt_stat.stdout
 
     - name: Register notAfter of etcd server certificate
       shell: >
@@ -156,7 +158,7 @@
     - name: Fail if notAfter of etcd server certificate is not next year
       fail:
         msg: "Failed because notAfter of etcd server certificate is not next year"
-      when:  next_year | string not in etcd_server_crt_stat.stdout
+      when: next_year | string not in etcd_server_crt_stat.stdout
 
     - name: Get year of next decade to check CA
       set_fact:
@@ -171,7 +173,10 @@
         | grep notAfter
       register: ca_crt_stat
 
+    # Caution:
+    # Can fail at end or beginning of year, since
+    # leap year days can be +- 3
     - name: Fail if notAfter of CA certificate is not next decade
       fail:
         msg: "Failed because notAfter of CA certificate is not next decade"
-      when:  next_decade | string not in ca_crt_stat.stdout
+      when: next_decade | string not in ca_crt_stat.stdout

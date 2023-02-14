@@ -79,21 +79,11 @@
     mode: 0600
   delegate_to: "{{ ca_ca_host }}"
 
-- name: Check if client certificate exists
-  ansible.builtin.stat:
-    path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.crt"
-  register: client_certificate
+- name: Check if client certificate has to be renewed
+  ansible.builtin.import_tasks: renew.yml
+  vars:
+    certificate_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.crt"
   when: ca_renew | bool
-
-- name: Verify client certificate will not expire soon
-  community.crypto.x509_certificate_info:
-    path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.crt"
-    valid_at:
-      check_period: "{{ ca_check_valid_time }}"
-  register: client_expire
-  when:
-    - ca_renew | bool
-    - client_certificate.stat.exists | bool
 
 - name: (Re)sign CSR with CA key
   community.crypto.x509_certificate:
@@ -105,7 +95,7 @@
     ownca_not_after: "{{ ca_valid_time }}"
     provider: ownca
     force:
-      "{{ not client_expire.valid_at.check_period | default(omit) or
+      "{{ not certificate_info.valid_at.check_period | default(omit) or
       hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
     backup: true
   delegate_to: "{{ ca_ca_host }}"
@@ -172,21 +162,11 @@
         mode: 0600
       delegate_to: "{{ ca_ca_host }}"
 
-    - name: Check if server certificate exists
-      ansible.builtin.stat:
-        path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.crt"
-      register: server_certificate
+    - name: Check if server certificate has to be renewed
+      ansible.builtin.import_tasks: renew.yml
+      vars:
+        certificate_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.crt"
       when: ca_renew | bool
-
-    - name: Verify server certificate will not expire soon
-      community.crypto.x509_certificate_info:
-        path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.crt"
-        valid_at:
-          check_period: "{{ ca_check_valid_time }}"
-      register: server_expire
-      when:
-        - ca_renew | bool
-        - server_certificate.stat.exists | bool
 
     - name: (Re)sign server CSR with CA key
       community.crypto.x509_certificate:
@@ -197,7 +177,9 @@
         ownca_privatekey_passphrase: "{{ ca_ca_password }}"
         ownca_not_after: "{{ ca_valid_time }}"
         provider: ownca
-        force: "{{ not server_expire.valid_at.check_period | default(omit) or hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
+        force:
+          "{{ not certificate_info.valid_at.check_period | default(omit) or
+          hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
         backup: true
       delegate_to: "{{ ca_ca_host }}"
 
@@ -299,21 +281,11 @@
         mode: 0600
       delegate_to: "{{ ca_ca_host }}"
 
-    - name: Check if etcd peer certificate exists
-      ansible.builtin.stat:
-        path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd.crt"
-      register: etcd_peer_certificate
+    - name: Check if etcd peer certificate has to be renewed
+      ansible.builtin.import_tasks: renew.yml
+      vars:
+        certificate_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd.crt"
       when: ca_renew | bool
-
-    - name: Verify etcd peer certificate will not expire soon
-      community.crypto.x509_certificate_info:
-        path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd.crt"
-        valid_at:
-          check_period: "{{ ca_check_valid_time }}"
-      register: etcd_peer_expire
-      when:
-        - ca_renew | bool
-        - etcd_peer_certificate.stat.exists | bool
 
     - name: (Re)sign CSR with CA key
       community.crypto.x509_certificate:
@@ -324,7 +296,9 @@
         ownca_privatekey_passphrase: "{{ ca_ca_password }}"
         ownca_not_after: "{{ ca_valid_time }}"
         provider: ownca
-        force: "{{ not etcd_peer_expire.valid_at.check_period | default(omit) or hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
+        force:
+          "{{ not certificate_info.valid_at.check_period | default(omit) or
+          hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
         backup: true
       delegate_to: "{{ ca_ca_host }}"
 
@@ -374,21 +348,11 @@
         mode: 0600
       delegate_to: "{{ ca_ca_host }}"
 
-    - name: Check if etcd server certificate exists
-      ansible.builtin.stat:
-        path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt"
-      register: etcd_server_certificate
+    - name: Check if etcd server certificate has to be renewed
+      ansible.builtin.import_tasks: renew.yml
+      vars:
+        certificate_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt"
       when: ca_renew | bool
-
-    - name: Verify etcd server certificate will not expire soon
-      community.crypto.x509_certificate_info:
-        path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt"
-        valid_at:
-          check_period: "{{ ca_check_valid_time }}"
-      register: etcd_server_expire
-      when:
-        - ca_renew | bool
-        - etcd_server_certificate.stat.exists | bool
 
     - name: (Re)sign CSR with CA key
       community.crypto.x509_certificate:
@@ -399,7 +363,9 @@
         ownca_privatekey_passphrase: "{{ ca_ca_password }}"
         ownca_not_after: "{{ ca_valid_time }}"
         provider: ownca
-        force: "{{ not etcd_server_expire.valid_at.check_period | default(omit) or hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
+        force:
+          "{{ not certificate_info.valid_at.check_period | default(omit) or
+          hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
         backup: true
       delegate_to: "{{ ca_ca_host }}"
 
