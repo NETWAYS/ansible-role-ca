@@ -133,7 +133,7 @@
 
     - name: Fail if notAfter of client certificate is not next year
       fail:
-        msg: "Failed because notAfter of client certificate is not next year"
+        msg: "Failed: notAfter of client certificate is not next year"
       when: next_year | string not in client_crt_stat.stdout
 
     - name: Register notAfter of server certificate
@@ -147,7 +147,7 @@
 
     - name: Fail if notAfter of server certificate is not next year
       fail:
-        msg: "Failed because notAfter of server certificate is not next year"
+        msg: "Failed: notAfter of server certificate is not next year"
       when: next_year | string not in server_crt_stat.stdout
 
     - name: Register notAfter of etcd certificate
@@ -161,7 +161,7 @@
 
     - name: Fail if notAfter of etcd certificate is not next year
       fail:
-        msg: "Failed because notAfter of etcd certificate is not next year"
+        msg: "Failed: notAfter of etcd certificate is not next year"
       when: next_year | string not in etcd_crt_stat.stdout
 
     - name: Register notAfter of etcd server certificate
@@ -175,7 +175,7 @@
 
     - name: Fail if notAfter of etcd server certificate is not next year
       fail:
-        msg: "Failed because notAfter of etcd server certificate is not next year"
+        msg: "Failed: notAfter of etcd server certificate isn't next year"
       when: next_year | string not in etcd_server_crt_stat.stdout
 
     - name: Get year of next decade to check CA
