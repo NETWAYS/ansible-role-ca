@@ -74,11 +74,11 @@
         {{ ca_ca_dir }}/ca.crt.{{ ansible_date_time.iso8601 }}
       when:
         - crt_exists.stat.exists | bool
-        - not certificate_info.valid_at.check_period | bool
+        - not crt_info.valid_at.check_period | bool
 
     - name: Set ca_ca_renewed variable
       ansible.builtin.set_fact:
-        ca_ca_renewed: "{{ not certificate_info.valid_at.check_period }}"
+        ca_ca_renewed: "{{ not crt_info.valid_at.check_period }}"
       when: crt_exists.stat.exists | bool
 
 - name: Generate CA certificate
