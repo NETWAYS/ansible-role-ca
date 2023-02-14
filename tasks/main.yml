@@ -95,7 +95,7 @@
     ownca_not_after: "{{ ca_valid_time }}"
     provider: ownca
     force:
-      "{{ not certificate_info.valid_at.check_period | default(omit) or
+      "{{ not crt_info.valid_at.check_period | default(omit) or
       hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
     backup: true
   delegate_to: "{{ ca_ca_host }}"
@@ -178,7 +178,7 @@
         ownca_not_after: "{{ ca_valid_time }}"
         provider: ownca
         force:
-          "{{ not certificate_info.valid_at.check_period | default(omit) or
+          "{{ not crt_info.valid_at.check_period | default(omit) or
           hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
         backup: true
       delegate_to: "{{ ca_ca_host }}"
@@ -297,7 +297,7 @@
         ownca_not_after: "{{ ca_valid_time }}"
         provider: ownca
         force:
-          "{{ not certificate_info.valid_at.check_period | default(omit) or
+          "{{ not crt_info.valid_at.check_period | default(omit) or
           hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
         backup: true
       delegate_to: "{{ ca_ca_host }}"
@@ -364,7 +364,7 @@
         ownca_not_after: "{{ ca_valid_time }}"
         provider: ownca
         force:
-          "{{ not certificate_info.valid_at.check_period | default(omit) or
+          "{{ not crt_info.valid_at.check_period | default(omit) or
           hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
         backup: true
       delegate_to: "{{ ca_ca_host }}"
