@@ -5,7 +5,7 @@
     path: "{{ crt_path }}"
   register: crt_exists
 
-- name: Verify client certificate will not expire soon
+- name: Verify certificate will not expire soon
   community.crypto.x509_certificate_info:
     path: "{{ crt_path }}"
     valid_at:
