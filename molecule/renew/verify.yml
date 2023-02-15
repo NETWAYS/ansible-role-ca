@@ -124,6 +124,7 @@
 
     - name: Register notAfter of client certificate
       shell: >
+        set -o pipefail &&
         openssl x509
         -noout
         -dates
@@ -138,6 +139,7 @@
 
     - name: Register notAfter of server certificate
       shell: >
+        set -o pipefail &&
         openssl x509
         -noout
         -dates
@@ -152,6 +154,7 @@
 
     - name: Register notAfter of etcd certificate
       shell: >
+        set -o pipefail &&
         openssl x509
         -noout
         -dates
@@ -166,6 +169,7 @@
 
     - name: Register notAfter of etcd server certificate
       shell: >
+        set -o pipefail &&
         openssl x509
         -noout
         -dates
@@ -184,6 +188,7 @@
 
     - name: Register notAfter of CA certificate
       shell: >
+        set -o pipefail &&
         openssl x509
         -noout
         -dates
