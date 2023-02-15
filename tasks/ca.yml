@@ -63,7 +63,6 @@
       ansible.builtin.import_tasks: renew.yml
       vars:
         crt_path: "{{ ca_ca_dir }}/ca.crt"
-      when: ca_renew | bool
 
     - name: Rotate expiring CA certificate
       ansible.builtin.command: >
