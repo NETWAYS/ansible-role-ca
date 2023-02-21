@@ -69,6 +69,7 @@
         mv
         {{ ca_ca_dir }}/ca.crt
         {{ ca_ca_dir }}/ca.crt.{{ ansible_date_time.iso8601 }}
+      changed_when: false
       when:
         - crt_exists.stat.exists | bool
         - not crt_info.valid_at.check_period | bool
