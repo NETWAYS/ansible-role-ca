@@ -45,6 +45,9 @@ You need to have the Python library `cryptography` in version `>1.2.3` available
 * `ca_client_ca_dir_owner`: User to own the certificate directory on the clients (default: `root`)
 * `ca_client_ca_dir_group`: Group to own the certificate directory on the clients (default: `root`)
 * `ca_client_ca_dir_mode`: Permissions of the certificate directory on the clients (default: `0700`)
+* `ca_renew`: Renew certificates if they expire within `ca_check_valid_time` timeframe (default: `false`)
+* `ca_valid_time`: Valid time of new created certificates (default: `+365d`)
+* `ca_check_valid_time`: Timeframe to check if certificates will expire (default: `+2w`)
 
 ## Example Playbook ##
 

@@ -79,14 +79,25 @@
     mode: 0600
   delegate_to: "{{ ca_ca_host }}"
 
-- name: Sign CSR with CA key
+- name: Check if client certificate has to be renewed
+  ansible.builtin.import_tasks: renew.yml
+  vars:
+    crt_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.crt"
+  when: ca_renew | bool
+
+- name: (Re)sign CSR with CA key
   community.crypto.x509_certificate:
     path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.crt"
     csr_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.csr"
     ownca_path: "{{ ca_ca_dir }}/ca.crt"
     ownca_privatekey_path: "{{ ca_ca_dir }}/ca.key"
     ownca_privatekey_passphrase: "{{ ca_ca_password }}"
+    ownca_not_after: "{{ ca_valid_time }}"
     provider: ownca
+    force:
+      "{{ not crt_info.valid_at.check_period | default(omit) or
+      hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
+    backup: true
   delegate_to: "{{ ca_ca_host }}"
 
 - name: Fetch certificate
@@ -151,14 +162,25 @@
         mode: 0600
       delegate_to: "{{ ca_ca_host }}"
 
-    - name: Sign server CSR with CA key
+    - name: Check if server certificate has to be renewed
+      ansible.builtin.import_tasks: renew.yml
+      vars:
+        crt_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.crt"
+      when: ca_renew | bool
+
+    - name: (Re)sign server CSR with CA key
       community.crypto.x509_certificate:
         path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.crt"
         csr_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.csr"
         ownca_path: "{{ ca_ca_dir }}/ca.crt"
         ownca_privatekey_path: "{{ ca_ca_dir }}/ca.key"
         ownca_privatekey_passphrase: "{{ ca_ca_password }}"
+        ownca_not_after: "{{ ca_valid_time }}"
         provider: ownca
+        force:
+          "{{ not crt_info.valid_at.check_period | default(omit) or
+          hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
+        backup: true
       delegate_to: "{{ ca_ca_host }}"
 
     - name: Fetch server certificate
@@ -192,6 +214,7 @@
             {{ ca_client_ca_dir }}/\
             {{ inventory_hostname }}-pkcs8.key.\
             {{ ansible_date_time.iso8601 }}
+          changed_when: false
           when:
             - key_stat.stat.exists | bool
             - key.changed | bool
@@ -259,14 +282,25 @@
         mode: 0600
       delegate_to: "{{ ca_ca_host }}"
 
-    - name: Sign CSR with CA key
+    - name: Check if etcd peer certificate has to be renewed
+      ansible.builtin.import_tasks: renew.yml
+      vars:
+        crt_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd.crt"
+      when: ca_renew | bool
+
+    - name: (Re)sign CSR with CA key
       community.crypto.x509_certificate:
         path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd.crt"
         csr_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd.csr"
         ownca_path: "{{ ca_ca_dir }}/ca.crt"
         ownca_privatekey_path: "{{ ca_ca_dir }}/ca.key"
         ownca_privatekey_passphrase: "{{ ca_ca_password }}"
+        ownca_not_after: "{{ ca_valid_time }}"
         provider: ownca
+        force:
+          "{{ not crt_info.valid_at.check_period | default(omit) or
+          hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
+        backup: true
       delegate_to: "{{ ca_ca_host }}"
 
     - name: Fetch certificate
@@ -315,14 +349,25 @@
         mode: 0600
       delegate_to: "{{ ca_ca_host }}"
 
-    - name: Sign CSR with CA key
+    - name: Check if etcd server certificate has to be renewed
+      ansible.builtin.import_tasks: renew.yml
+      vars:
+        crt_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt"
+      when: ca_renew | bool
+
+    - name: (Re)sign CSR with CA key
       community.crypto.x509_certificate:
         path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt"
         csr_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd-server.csr"
         ownca_path: "{{ ca_ca_dir }}/ca.crt"
         ownca_privatekey_path: "{{ ca_ca_dir }}/ca.key"
         ownca_privatekey_passphrase: "{{ ca_ca_password }}"
+        ownca_not_after: "{{ ca_valid_time }}"
         provider: ownca
+        force:
+          "{{ not crt_info.valid_at.check_period | default(omit) or
+          hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
+        backup: true
       delegate_to: "{{ ca_ca_host }}"
 
     - name: Fetch certificate

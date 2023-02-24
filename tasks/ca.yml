@@ -55,6 +55,30 @@
   args:
     creates: "{{ ca_ca_dir }}/ca.key"
 
+- name: Renew CA certificate
+  when: ca_renew | bool
+  block:
+
+    - name: Check if CA certificate has to be renewed
+      ansible.builtin.import_tasks: renew.yml
+      vars:
+        crt_path: "{{ ca_ca_dir }}/ca.crt"
+
+    - name: Rotate expiring CA certificate
+      ansible.builtin.command: >
+        mv
+        {{ ca_ca_dir }}/ca.crt
+        {{ ca_ca_dir }}/ca.crt.{{ ansible_date_time.iso8601 }}
+      changed_when: false
+      when:
+        - crt_exists.stat.exists | bool
+        - not crt_info.valid_at.check_period | bool
+
+    - name: Set ca_ca_renewed variable
+      ansible.builtin.set_fact:
+        ca_ca_renewed: "{{ not crt_info.valid_at.check_period }}"
+      when: crt_exists.stat.exists | bool
+
 - name: Generate CA certificate
   ansible.builtin.command: >
     openssl req
