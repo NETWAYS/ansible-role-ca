@@ -10,6 +10,9 @@
     ca_logstash: true
     ca_etcd: true
     ca_etcd_group: molecule
+    ca_ca_days: 3650
+    ca_valid_time: +365d
+    ca_renew: true
   tasks:
     - name: "Include CA role"
       include_role:

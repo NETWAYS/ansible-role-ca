@@ -13,25 +13,25 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
-      max-parallel: 4
+      max-parallel: 1
       matrix:
-        distro: [centos7, rockylinux8]
-        scenario: [default]
+        distro: [rockylinux8]
+        scenario: [default, renew, ca-renew]
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.8
+          python-version: 3.9
 
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
           python3 -m pip install -r requirements-test.txt
 
-      - name: Test with molecule
+      - name: ${{ matrix.scenario }} molecule test
         run: |
           molecule test -s ${{ matrix.scenario }}
         env:

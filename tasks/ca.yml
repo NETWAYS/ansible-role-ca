@@ -1,7 +1,7 @@
 ---
 
 - name: Place CA configuration file
-  template:
+  ansible.builtin.template:
     src: ca.conf.j2
     dest: "{{ ca_ca_dir }}/ca.conf"
     owner: root
@@ -9,7 +9,7 @@
     mode: 0600
 
 - name: Check if CA key is already created
-  stat:
+  ansible.builtin.stat:
     path: "{{ ca_ca_dir }}/ca.key"
   register: cakey
 
@@ -18,7 +18,7 @@
   block:
 
     - name: Test CA key if present
-      openssl_privatekey_info:
+      community.crypto.openssl_privatekey_info:
         path: "{{ ca_ca_dir }}/ca.key"
         passphrase: "{{ ca_ca_password }}"
       register: cakeyinfo
@@ -30,7 +30,7 @@
       block:
 
         - name: Move old key
-          command: >
+          ansible.builtin.command: >
             mv
             {{ ca_ca_dir }}/ca.key
             {{ ca_ca_dir }}/ca.key.{{ ansible_date_time.iso8601 }}
@@ -38,7 +38,7 @@
             creates: "{{ ca_ca_dir }}/ca.key.{{ ansible_date_time.iso8601 }}"
 
         - name: Move old certificate
-          command: >
+          ansible.builtin.command: >
             mv
             {{ ca_ca_dir }}/ca.crt
             {{ ca_ca_dir }}/ca.crt.{{ ansible_date_time.iso8601 }}
@@ -46,7 +46,7 @@
             creates: "{{ ca_ca_dir }}/ca.key.{{ ansible_date_time.iso8601 }}"
 
 - name: Generate CA key
-  command: >
+  ansible.builtin.command: >
     openssl genrsa
     -aes256
     -passout pass:{{ ca_ca_password }}
@@ -55,8 +55,32 @@
   args:
     creates: "{{ ca_ca_dir }}/ca.key"
 
+- name: Renew CA certificate
+  when: ca_renew | bool
+  block:
+
+    - name: Check if CA certificate has to be renewed
+      ansible.builtin.import_tasks: renew.yml
+      vars:
+        crt_path: "{{ ca_ca_dir }}/ca.crt"
+
+    - name: Rotate expiring CA certificate
+      ansible.builtin.command: >
+        mv
+        {{ ca_ca_dir }}/ca.crt
+        {{ ca_ca_dir }}/ca.crt.{{ ansible_date_time.iso8601 }}
+      changed_when: false
+      when:
+        - crt_exists.stat.exists | bool
+        - not crt_info.valid_at.check_period | bool
+
+    - name: Set ca_ca_renewed variable
+      ansible.builtin.set_fact:
+        ca_ca_renewed: "{{ not crt_info.valid_at.check_period }}"
+      when: crt_exists.stat.exists | bool
+
 - name: Generate CA certificate
-  command: >
+  ansible.builtin.command: >
     openssl req
     -x509
     -new

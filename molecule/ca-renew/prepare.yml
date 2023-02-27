@@ -1,6 +1,14 @@
 ---
 - name: Prepare
   hosts: all
+  vars:
+    ca_ca_host: ca_default
+    ca_logstash: true
+    ca_etcd: true
+    ca_etcd_group: molecule
+    ca_ca_days: 5
+    ca_valid_time: "+14d"
+    ca_renew: true
   tasks:
 
     - name: Install Python libraries
@@ -20,3 +28,10 @@
         state: started
         enabled: yes
       when: ansible_os_family == "RedHat"
+
+    - name: Gather facts again to define ansible_default_ipv4
+      setup:
+
+    - name: "Include CA role"
+      include_role:
+        name: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
