@@ -13,7 +13,6 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
-      max-parallel: 1
       matrix:
         distro: [rockylinux8]
         scenario: [default, renew, ca-renew]
