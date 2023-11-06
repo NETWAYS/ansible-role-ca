@@ -1,0 +1,22 @@
+---
+- name: Prepare
+  hosts: all
+  tasks:
+
+    - name: Install Python libraries
+      pip:
+        name: cryptography>= 1.2.3
+
+    - name: Install packages for RHEL
+      package:
+        name:
+          - iproute
+          - NetworkManager
+      when: ansible_os_family == "RedHat"
+
+    - name: Start NetworkManager
+      service:
+        name: NetworkManager
+        state: started
+        enabled: yes
+      when: ansible_os_family == "RedHat"

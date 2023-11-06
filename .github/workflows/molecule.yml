@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         distro: [rockylinux8]
-        scenario: [default, renew, ca-renew]
+        scenario: [default, renew, ca-renew, logstash]
     steps:
       - name: Check out code
         uses: actions/checkout@v4

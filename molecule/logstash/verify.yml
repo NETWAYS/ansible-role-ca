@@ -1,0 +1,118 @@
+---
+
+- name: Verify
+  hosts: all
+  vars:
+    ca_ca_dir: /opt/ca
+    ca_client_ca_dir: /opt/ca
+  tasks:
+
+    - name: Verify signature on certificate
+      command: >
+        openssl verify
+        -verbose
+        -CAfile {{ ca_ca_dir }}/ca.crt
+        {{ ca_client_ca_dir }}/{{ inventory_hostname }}.crt
+
+    - name: Verify signature on server certificate
+      command: >
+        openssl verify
+        -verbose
+        -CAfile {{ ca_ca_dir }}/ca.crt
+        {{ ca_client_ca_dir }}/{{ inventory_hostname }}-server.crt
+
+    - name: Check if instance key is present
+      stat:
+        path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
+      register: instance_key_stat
+
+    - name: Fail if instance key is missing
+      fail:
+        msg: "Instance key is missing"
+      when:
+        - not instance_key_stat.stat.exists | bool
+
+    - name: Check if Logstash key is present
+      stat:
+        path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
+      register: logstash_key_stat
+
+    - name: Fail if Logstash key is missing
+      fail:
+        msg: "Logstash key is missing"
+      when:
+        - not logstash_key_stat.stat.exists | bool
+
+    - name: Verify signature on etcd peer certificate
+      command: >
+        openssl verify
+        -verbose
+        -CAfile {{ ca_ca_dir }}/ca.crt
+        {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.crt
+
+    - name: Verify signature on etcd server certificate
+      command: >
+        openssl verify
+        -verbose
+        -CAfile {{ ca_ca_dir }}/ca.crt
+        {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt
+
+    - name: Verify signature on etcd server certificate
+      command: >
+        openssl verify
+        -verbose
+        -CAfile {{ ca_ca_dir }}/ca.crt
+        {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt
+
+    - name: Register SAN of etcd peer certificate
+      command: >
+        openssl x509
+        -text -noout
+        -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.crt
+        -certopt "
+        no_subject,
+        no_header,
+        no_version,
+        no_serial,
+        no_signame,
+        no_validity,
+        no_issuer,
+        no_pubkey,
+        no_sigdump,
+        no_aux"
+      register: etcd_san_peer_stat
+
+    - name: Register SAN of etcd server certificate
+      command: >
+        openssl x509
+        -text
+        -noout
+        -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt
+        -certopt "
+        no_subject,
+        no_header,
+        no_version,
+        no_serial,
+        no_signame,
+        no_validity,
+        no_issuer,
+        no_pubkey,
+        no_sigdump,
+        no_aux"
+      register: etcd_san_server_stat
+
+    - name: Fail if SAN of etcd peer certificate is missing IP addresses
+      fail:
+        msg: "Default IPv4 address in etcd peer certifcate are missing"
+      when:
+        - hostvars['ca_default_client']['ansible_default_ipv4']['address']
+          not in etcd_san_peer_stat.stdout
+        - '"127.0.0.1" not in etcd_san_peer_stat.stdout'
+
+    - name: Fail if SAN of etcd server certificate is missing IP addresses
+      fail:
+        msg: "Default IPv4 address in etcd server certifcate are missing"
+      when:
+        - hostvars['ca_default_client']['ansible_default_ipv4']['address']
+          not in etcd_san_server_stat.stdout
+        - '"127.0.0.1" not in etcd_san_server_stat.stdout'
