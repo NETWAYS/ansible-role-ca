@@ -15,6 +15,7 @@
     ca_openssl_cipher: auto
     ca_ca_dir: /opt/logstash-ca
     logstash_certs_dir: /opt/logstash-ca
+    elasticstack_release: "{{ lookup('env', 'ELASTIC_RELEASE') | int}}"
   tasks:
     - name: "Include CA role"
       include_role:
