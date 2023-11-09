@@ -124,7 +124,7 @@
 
     - name: Register notAfter of client certificate
       shell: >
-        set -o pipefail &&
+        if test -n "$(ps -p $$ | grep bash)"; then set -o pipefail; fi;
         openssl x509
         -noout
         -dates
@@ -139,7 +139,7 @@
 
     - name: Register notAfter of server certificate
       shell: >
-        set -o pipefail &&
+        if test -n "$(ps -p $$ | grep bash)"; then set -o pipefail; fi;
         openssl x509
         -noout
         -dates
@@ -154,7 +154,7 @@
 
     - name: Register notAfter of etcd certificate
       shell: >
-        set -o pipefail &&
+        if test -n "$(ps -p $$ | grep bash)"; then set -o pipefail; fi;
         openssl x509
         -noout
         -dates
@@ -169,7 +169,7 @@
 
     - name: Register notAfter of etcd server certificate
       shell: >
-        set -o pipefail &&
+        if test -n "$(ps -p $$ | grep bash)"; then set -o pipefail; fi;
         openssl x509
         -noout
         -dates
@@ -188,7 +188,7 @@
 
     - name: Register notAfter of CA certificate
       shell: >
-        set -o pipefail &&
+        if test -n "$(ps -p $$ | grep bash)"; then set -o pipefail; fi;
         openssl x509
         -noout
         -dates
