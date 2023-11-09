@@ -17,6 +17,8 @@
     ca_keypassphrase: "moleculetest"
     logstash_certs_dir: /opt/logstash-ca
     elasticstack_release: "{{ lookup('env', 'ELASTIC_RELEASE') | int}}"
+    elasticstack_no_log: false
+    elasticstack_full_stack: false
   tasks:
     - name: "Include CA role"
       include_role:

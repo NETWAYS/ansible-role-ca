@@ -24,5 +24,7 @@
     - name: Install common packages
       package:
         name:
+          - gpg
           - gpg-agent
+        update_cache: yes
       when: ansible_os_family == "Debian"
