@@ -4,7 +4,7 @@ dependency:
 driver:
   name: docker
 platforms:
-  - name: ca_logstash
+  - name: ca_default
     image: "geerlingguy/docker-${MOLECULE_DISTRO:-centos7}-ansible:latest"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     volumes:
@@ -12,7 +12,7 @@ platforms:
     privileged: true
     pre_build_image: true
     cgroupns_mode: host
-  - name: ca_logstash_client
+  - name: ca_default_client
     image: "geerlingguy/docker-${MOLECULE_DISTRO:-centos7}-ansible:latest"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     volumes:
