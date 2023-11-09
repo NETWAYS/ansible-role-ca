@@ -14,12 +14,17 @@
     ca_etcd_group: molecule
     ca_openssl_cipher: auto
     ca_ca_dir: /opt/logstash-ca
+    ca_keypassphrase: "moleculetest"
     logstash_certs_dir: /opt/logstash-ca
     elasticstack_release: "{{ lookup('env', 'ELASTIC_RELEASE') | int}}"
   tasks:
     - name: "Include CA role"
       include_role:
         name: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+
+    - name: "Include Elastic repos role"
+      include_role:
+        name: repos
 
     - name: "Include Logstash role"
       include_role:

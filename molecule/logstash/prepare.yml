@@ -20,3 +20,9 @@
         state: started
         enabled: yes
       when: ansible_os_family == "RedHat"
+
+    - name: Install common packages
+      package:
+        name:
+          - gpg-agent
+      when: ansible_os_family == "Debian"

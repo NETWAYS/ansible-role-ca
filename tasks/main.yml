@@ -261,6 +261,7 @@
       community.crypto.openssl_csr:
         path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.csr"
         privatekey_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
+        privatekey_passphrase: "{{ ca_keypassphrase | default(omit, true) }}"
         country_name: "{{ ca_country }}"
         organization_name: "{{ ca_organization }}"
         common_name: "{{ inventory_hostname }}"
@@ -328,6 +329,7 @@
       community.crypto.openssl_csr:
         path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.csr"
         privatekey_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
+        privatekey_passphrase: "{{ ca_keypassphrase | default(omit, true) }}"
         country_name: "{{ ca_country }}"
         organization_name: "{{ ca_organization }}"
         common_name: "{{ inventory_hostname }}"
