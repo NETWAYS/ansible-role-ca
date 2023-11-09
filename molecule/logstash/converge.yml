@@ -10,8 +10,6 @@
   vars:
     ca_ca_host: ca_default
     ca_logstash: true
-    ca_etcd: true
-    ca_etcd_group: molecule
     ca_openssl_cipher: auto
     ca_ca_dir: /opt/logstash-ca
     ca_keypassphrase: "moleculetest"
