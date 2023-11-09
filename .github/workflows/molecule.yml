@@ -74,9 +74,6 @@ jobs:
           # workaround for broken galaxy information in the collection
           mkdir -p ~/.ansible/collections/ansible-collections/netways
           git clone https://github.com/NETWAYS/ansible-collection-elasticstack.git ~/.ansible/collections/ansible-collections/netways/elasticstack
-          mkdir -p /home/runner/.ansible/roles
-          ln -s ~/.ansible/collections/ansible-collections/netways/elasticstack/roles/repos /home/runner/.ansible/roles/
-          ln -s ~/.ansible/collections/ansible-collections/netways/elasticstack/roles/logstash /home/runner/.ansible/roles/
 
       - name: ${{ matrix.scenario }} molecule test
         run: |
