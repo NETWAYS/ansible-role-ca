@@ -72,8 +72,8 @@ jobs:
           python3 -m pip install --upgrade pip
           python3 -m pip install -r requirements-test.txt
           # workaround for broken galaxy information in the collection
-          mkdir -p ~/.ansible/collections/ansible-collections/netways
-          git clone https://github.com/NETWAYS/ansible-collection-elasticstack.git ~/.ansible/collections/ansible-collections/netways/elasticstack
+          #mkdir -p ~/.ansible/collections/ansible-collections/netways
+          #git clone https://github.com/NETWAYS/ansible-collection-elasticstack.git ~/.ansible/collections/ansible-collections/netways/elasticstack
 
       - name: ${{ matrix.scenario }} molecule test
         run: |
