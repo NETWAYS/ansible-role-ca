@@ -14,6 +14,7 @@
     ca_ca_dir: /opt/logstash-ca
     ca_keypassphrase: "moleculetest"
     logstash_certs_dir: /opt/logstash-ca
+    logstash_beats_tls: true
     elasticstack_release: "{{ lookup('env', 'ELASTIC_RELEASE') | int}}"
     elasticstack_no_log: false
     elasticstack_full_stack: false
