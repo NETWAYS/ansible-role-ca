@@ -42,3 +42,7 @@
         msg: "Logstash key is missing"
       when:
         - not logstash_key_stat.stat.exists | bool
+
+    - name: Check for running Logstash
+      wait_for:
+        port: 5044
