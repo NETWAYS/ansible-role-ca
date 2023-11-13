@@ -225,7 +225,7 @@
             -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}.key
             -topk8
             -passin pass:{{ ca_keypassphrase | default(omit, true) }}
-            {% if ca_ls7_workaround | bool %}v1 PBE-SHA1-RC4-128{% endif %}
+            {% if ca_ls7_workaround | bool %}-v1 PBE-SHA1-RC4-128{% endif %}
             -out {{ ca_client_ca_dir }}/{{ inventory_hostname }}-pkcs8.key
             -passout pass:{{ ca_keypassphrase | default(omit, true) }}
           args:
