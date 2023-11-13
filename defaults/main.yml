@@ -29,6 +29,7 @@ ca_altname_3: "{{ inventory_hostname }}"
 ca_ca_keylength: 2048
 
 ca_ls7_workaround: false
+ca_ls7_workaround_cipher: PBE-SHA1-RC4-128
 
 ca_renew: false
 ca_ca_days: 3650

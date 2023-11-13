@@ -58,6 +58,7 @@ These workarounds usually don't get their own test scenarios in molecule. They w
 All of these have the default value `false`.
 
 * `ca_ls7_workaround`: Enable pinning key parameters for a Logstash compatible key. These settings make sure the key works with a certain combination of OpenSSL and Logstash. Symptom: Logstash logs that a valid PKCS8 key is invalid.
+* `ca_ls7_workaround_cipher`: The cipher to use for the workaround (default: `PBE-SHA1-RC4-128`)
 
 ## Example Playbook ##
 
