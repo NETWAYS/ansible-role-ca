@@ -14,8 +14,14 @@ jobs:
 
     strategy:
       matrix:
-        distro: [rockylinux8, rockylinux9, ubuntu2204]
-        scenario: [default, renew, ca-renew]
+        distro: 
+          - rockylinux8
+          - rockylinux9
+          - ubuntu2204
+        scenario: 
+          - default
+          - renew
+          - ca-renew
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -37,3 +43,44 @@ jobs:
           PY_COLORS: '1'
           ANSIBLE_FORCE_COLOR: '1'
           MOLECULE_DISTRO: ${{ matrix.distro }}
+
+  logstash:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        distro: 
+          - rockylinux8
+          - rockylinux9
+          - ubuntu2204
+        scenario: 
+          - logstash
+        release: 
+          - 7
+          - 8
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r requirements-test.txt
+          # workaround for broken galaxy information in the collection
+          ansible-galaxy collection install git+https://github.com/NETWAYS/ansible-collection-elasticstack.git
+          #mkdir -p ~/.ansible/collections/ansible-collections/netways
+          #git clone https://github.com/NETWAYS/ansible-collection-elasticstack.git ~/.ansible/collections/ansible-collections/netways/elasticstack
+
+      - name: ${{ matrix.scenario }} molecule test
+        run: |
+          molecule test -s ${{ matrix.scenario }}
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'
+          MOLECULE_DISTRO: ${{ matrix.distro }}
+          ELASTIC_RELEASE: ${{ matrix.release }}
