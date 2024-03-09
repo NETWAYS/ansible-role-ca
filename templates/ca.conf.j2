@@ -4,14 +4,28 @@ req_extensions = v3_req
 prompt = no
 
 [req_distinguished_name]
+{% if ca_country is defined %}
 countryName                     = {{ ca_country }}
+{% endif %}
+{% if ca_state is defined %}
 stateOrProvinceName             = {{ ca_state }}
+{% endif %}
+{% if ca_localicy is defined %}
 localityName                    = {{ ca_locality }}
+{% endif %}
+{% if ca_postalcode is defined %}
 postalCode                      = {{ ca_postalcode }}
+{% endif %}
+{% if ca_organization is defined %}
 organizationName                = {{ ca_organization }}
+{% endif %}
+{% if ca_organizationunit is defined %}
 organizationalUnitName          = {{ ca_organizationalunit }}
+{% endif %}
 commonName                      = {{ ca_common_name }}
+{% if ca_email is defined %}
 emailAddress                    = {{ ca_email }}
+{% endif %}
 
 {% if _ca_ca_openssl_version_3 | bool %}
 [v3_ca]
