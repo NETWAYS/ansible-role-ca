@@ -3,14 +3,15 @@
   hosts: all
   vars:
     ca_ca_host: ca_default
+    ca_ca_password: ChangeMe
     ca_logstash: true
     ca_etcd: true
     ca_etcd_group: molecule
     ca_ca_days: 5
     ca_valid_time: "+14d"
     ca_renew: true
-  tasks:
 
+  pre_tasks:
     - name: Install Python libraries
       pip:
         name: cryptography>= 1.2.3
@@ -32,6 +33,11 @@
     - name: Gather facts again to define ansible_default_ipv4
       setup:
 
-    - name: "Include CA role"
-      include_role:
-        name: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+  roles:
+    - name: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+    - name: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+      vars:
+        ca_ca_signing_key_algorithm: Ed25519
+        ca_ca_dir: /opt/ca-ed25519
+        ca_client_ca_dir: /opt/ca-ed25519
+        ca_localdir: /tmp/ca-ed25519

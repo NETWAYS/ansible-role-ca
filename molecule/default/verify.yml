@@ -1,6 +1,8 @@
 ---
 - name: Verify
   hosts: all
+  vars:
+    ca_ca_password: ChangeMe
   tasks:
     - name: Verify RSA
       ansible.builtin.include_tasks: verify_tasks.yml
