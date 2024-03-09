@@ -26,6 +26,8 @@ You need to have the Python library `cryptography` in version `>1.2.3` available
 
 * `ca_manage_openssl`: Install `openssl` package? (default: `true`)
 * `ca_ca_dir`: Directory to place CA and certificates (default: `/opt/ca`)
+* `ca_ca_dir_owner`: CA directory owner (default: `root`)
+* `ca_ca_dir_group`: CA directory group (default: `root`)
 * `ca_ca_days`: Runtime of the CA certificate (default: `3650`)
 * `ca_ca_password`: Password of CA key (default: `ChangeMe`)
 * `ca_localdir`: Temporary directory on Ansible management host (default: `/tmp/ca`)

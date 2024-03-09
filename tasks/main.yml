@@ -10,8 +10,8 @@
 - name: Ensure CA directory exists
   ansible.builtin.file:
     path: "{{ ca_ca_dir }}"
-    owner: root
-    group: root
+    owner: "{{ ca_ca_dir_owner }}"
+    group: "{{ ca_ca_dir_group }}"
     mode: 0700
     state: directory
   delegate_to: "{{ ca_ca_host }}"
@@ -77,8 +77,8 @@
   ansible.builtin.copy:
     src: "{{ ca_localdir }}/{{ inventory_hostname }}.csr"
     dest: "{{ ca_ca_dir }}/{{ inventory_hostname }}.csr"
-    owner: root
-    group: root
+    owner: "{{ ca_ca_dir_owner }}"
+    group: "{{ ca_ca_dir_group }}"
     mode: 0600
   delegate_to: "{{ ca_ca_host }}"
 
@@ -158,8 +158,8 @@
       ansible.builtin.copy:
         src: "{{ ca_localdir }}/{{ inventory_hostname }}-server.csr"
         dest: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.csr"
-        owner: root
-        group: root
+        owner: "{{ ca_ca_dir_owner }}"
+        group: "{{ ca_ca_dir_group }}"
         mode: 0600
       delegate_to: "{{ ca_ca_host }}"
 
@@ -235,8 +235,8 @@
         - name: Set permissions on Logstash key
           ansible.builtin.file:
             path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
-            owner: root
-            group: root
+            owner: "{{ ca_client_ca_dir_owner }}"
+            group: "{{ ca_client_ca_dir_group }}"
             mode: 0600
 
 ### etcd peer certificate ###
@@ -278,8 +278,8 @@
       ansible.builtin.copy:
         src: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd.csr"
         dest: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd.csr"
-        owner: root
-        group: root
+        owner: "{{ ca_ca_dir_owner }}"
+        group: "{{ ca_ca_dir_group }}"
         mode: 0600
       delegate_to: "{{ ca_ca_host }}"
 
@@ -343,8 +343,8 @@
       ansible.builtin.copy:
         src: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd-server.csr"
         dest: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd-server.csr"
-        owner: root
-        group: root
+        owner: "{{ ca_ca_dir_owner }}"
+        group: "{{ ca_ca_dir_group }}"
         mode: 0600
       delegate_to: "{{ ca_ca_host }}"
 

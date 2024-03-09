@@ -1,6 +1,8 @@
 ---
 ca_manage_openssl: true
 ca_ca_dir: /opt/ca
+ca_ca_dir_owner: root
+ca_ca_dir_group: root
 ca_client_ca_dir: /opt/ca
 ca_client_ca_dir_owner: root
 ca_client_ca_dir_group: root
