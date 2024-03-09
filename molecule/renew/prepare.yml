@@ -9,7 +9,6 @@
     ca_valid_time: "+5d"
     ca_renew: true
   tasks:
-
     - name: Install Python libraries
       pip:
         name: cryptography>= 1.2.3

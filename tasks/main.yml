@@ -1,5 +1,4 @@
 ---
-
 - name: Ensure CA directory exists on clients
   ansible.builtin.file:
     path: "{{ ca_client_ca_dir }}"
@@ -54,6 +53,7 @@
     owner: "{{ ca_client_ca_dir_owner }}"
     group: "{{ ca_client_ca_dir_group }}"
     mode: "{{ ca_client_ca_dir_mode }}"
+    type: "{{ ca_client_key_algorithm }}"
   register: key
 
 - name: Create CSR
@@ -97,8 +97,7 @@
     ownca_privatekey_passphrase: "{{ ca_ca_password }}"
     ownca_not_after: "{{ ca_valid_time }}"
     provider: ownca
-    force:
-      "{{ not crt_info.valid_at.check_period | default(omit) or
+    force: "{{ not crt_info.valid_at.check_period | default(omit) or
       hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
     backup: true
   delegate_to: "{{ ca_ca_host }}"
@@ -138,7 +137,6 @@
 - name: Create server certificate
   when: ca_server_cert | bool
   block:
-
     - name: Create server CSR
       community.crypto.openssl_csr:
         path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-server.csr"
@@ -180,8 +178,7 @@
         ownca_privatekey_passphrase: "{{ ca_ca_password }}"
         ownca_not_after: "{{ ca_valid_time }}"
         provider: ownca
-        force:
-          "{{ not crt_info.valid_at.check_period | default(omit) or
+        force: "{{ not crt_info.valid_at.check_period | default(omit) or
           hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
         backup: true
       delegate_to: "{{ ca_ca_host }}"
@@ -204,7 +201,6 @@
     - name: Handle Logstash compatible key
       when: ca_logstash | bool
       block:
-
         - name: Check if Logstash key is present
           ansible.builtin.stat:
             path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
@@ -248,7 +244,6 @@
 - name: Create etcd peer certificate
   when: ca_etcd | bool
   block:
-
     - name: Add IP addresses for etcd to ca_san_etcd
       ansible.builtin.set_fact:
         ca_san_etcd: >-
@@ -303,8 +298,7 @@
         ownca_privatekey_passphrase: "{{ ca_ca_password }}"
         ownca_not_after: "{{ ca_valid_time }}"
         provider: ownca
-        force:
-          "{{ not crt_info.valid_at.check_period | default(omit) or
+        force: "{{ not crt_info.valid_at.check_period | default(omit) or
           hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
         backup: true
       delegate_to: "{{ ca_ca_host }}"
@@ -329,7 +323,6 @@
 - name: Create etcd server certificate
   when: ca_etcd | bool
   block:
-
     - name: Create CSR
       community.crypto.openssl_csr:
         path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.csr"
@@ -370,8 +363,7 @@
         ownca_privatekey_passphrase: "{{ ca_ca_password }}"
         ownca_not_after: "{{ ca_valid_time }}"
         provider: ownca
-        force:
-          "{{ not crt_info.valid_at.check_period | default(omit) or
+        force: "{{ not crt_info.valid_at.check_period | default(omit) or
           hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
         backup: true
       delegate_to: "{{ ca_ca_host }}"

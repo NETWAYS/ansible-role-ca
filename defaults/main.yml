@@ -1,15 +1,17 @@
 ---
-
 ca_manage_openssl: true
 ca_ca_dir: /opt/ca
 ca_client_ca_dir: /opt/ca
 ca_client_ca_dir_owner: root
 ca_client_ca_dir_group: root
 ca_client_ca_dir_mode: 0700
+ca_client_key_algorithm: "{{ ca_ca_signing_key_algorithm }}"
 ca_ca_password: ChangeMe
 ca_localdir: /tmp/ca
 ca_local_become: false
 ca_ca_host: localhost
+ca_ca_signing_key_algorithm: RSA
+ca_ca_signing_key_params: ""
 
 ca_server_cert: true
 ca_logstash: false
