@@ -36,12 +36,12 @@
   ansible.builtin.import_tasks: ca.yml
   when: ca_ca_host == inventory_hostname
 
-- name: Set ca_san to hostname, FQDN, and inventory hostname
+- name: Set ca_san to alternative names or (hostname, FQDN, and inventory hostname)
   ansible.builtin.set_fact:
     ca_san: >-
-      DNS:{{ ansible_hostname }},
-      DNS:{{ ansible_fqdn }},
-      DNS:{{ inventory_hostname }}
+      DNS:{{ ca_altname_1 }},
+      DNS:{{ ca_altname_2 }},
+      DNS:{{ ca_altname_3 }}
 
 ### client certificate ###
 
@@ -63,7 +63,7 @@
     privatekey_passphrase: "{{ ca_keypassphrase | default(omit, true) }}"
     country_name: "{{ ca_country | default(omit, true) }}"
     organization_name: "{{ ca_organization | default(omit, true) }}"
-    common_name: "{{ inventory_hostname }}"
+    common_name: "{{ ca_common_name }}"
     subject_alt_name: "{{ ca_san | regex_replace(' ', '') }}"
     extended_key_usage: "{{ extended_key_usage | default(omit, true) }}"
 
@@ -144,7 +144,7 @@
         privatekey_passphrase: "{{ ca_keypassphrase | default(omit, true) }}"
         country_name: "{{ ca_country | default(omit, true) }}"
         organization_name: "{{ ca_organization | default(omit, true) }}"
-        common_name: "{{ inventory_hostname }}"
+        common_name: "{{ ca_common_name }}"
         subject_alt_name: "{{ ca_san | regex_replace(' ', '') }}"
         extended_key_usage: "{{ extended_key_usage | default(omit, true) }}"
 
@@ -264,7 +264,7 @@
         privatekey_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
         country_name: "{{ ca_country | default(omit, true) }}"
         organization_name: "{{ ca_organization | default(omit, true) }}"
-        common_name: "{{ inventory_hostname }}"
+        common_name: "{{ ca_common_name }}"
         subject_alt_name: "{{ ca_san_etcd | regex_replace(' ', '') }}"
         extended_key_usage: "{{ extended_key_usage | default(omit, true) }}"
 
@@ -329,7 +329,7 @@
         privatekey_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
         country_name: "{{ ca_country | default(omit, true) }}"
         organization_name: "{{ ca_organization | default(omit, true) }}"
-        common_name: "{{ inventory_hostname }}"
+        common_name: "{{ ca_common_name }}"
         subject_alt_name: "{{ ca_san_etcd | regex_replace(' ', '') }}"
         extended_key_usage: "{{ extended_key_usage | default(omit, true) }}"
 
