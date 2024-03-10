@@ -3,16 +3,20 @@
   hosts: all
   vars:
     ca_ca_password: ChangeMe
+    valid_days: 365
+    ca_ca_days: 5
+    # allowed delta between certificate generation and notAfter validation
+    max_test_duration_seconds: 900
   tasks:
     - name: Verify RSA
       ansible.builtin.include_tasks: verify_tasks.yml
       vars:
         ca_ca_dir: /opt/ca
-        ca_client_ca_dir: /opt/ca
+        ca_client_ca_dir: /opt/certs
     - name: Verify Ed25519
       ansible.builtin.include_tasks: verify_tasks.yml
       vars:
         ca_ca_signing_key_algorithm: Ed25519
         ca_ca_dir: /opt/ca-ed25519
-        ca_client_ca_dir: /opt/ca-ed25519
+        ca_client_ca_dir: /opt/certs-ed25519
         ca_localdir: /tmp/ca-ed25519

@@ -2,14 +2,14 @@
   command: >
     openssl verify
     -verbose
-    -CAfile {{ ca_ca_dir }}/ca.crt
+    -CAfile {{ ca_client_ca_dir }}/ca.crt
     {{ ca_client_ca_dir }}/{{ inventory_hostname }}.crt
 
 - name: Verify signature on server certificate
   command: >
     openssl verify
     -verbose
-    -CAfile {{ ca_ca_dir }}/ca.crt
+    -CAfile {{ ca_client_ca_dir }}/ca.crt
     {{ ca_client_ca_dir }}/{{ inventory_hostname }}-server.crt
 
 - name: Check if instance key is present
@@ -38,21 +38,21 @@
   command: >
     openssl verify
     -verbose
-    -CAfile {{ ca_ca_dir }}/ca.crt
+    -CAfile {{ ca_client_ca_dir }}/ca.crt
     {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.crt
 
 - name: Verify signature on etcd server certificate
   command: >
     openssl verify
     -verbose
-    -CAfile {{ ca_ca_dir }}/ca.crt
+    -CAfile {{ ca_client_ca_dir }}/ca.crt
     {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt
 
 - name: Verify signature on etcd server certificate
   command: >
     openssl verify
     -verbose
-    -CAfile {{ ca_ca_dir }}/ca.crt
+    -CAfile {{ ca_client_ca_dir }}/ca.crt
     {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt
 
 - name: Register SAN of etcd peer certificate

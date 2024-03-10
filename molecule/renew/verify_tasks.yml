@@ -2,14 +2,14 @@
   command: >
     openssl verify
     -verbose
-    -CAfile {{ ca_ca_dir }}/ca.crt
+    -CAfile {{ ca_client_ca_dir }}/ca.crt
     {{ ca_client_ca_dir }}/{{ inventory_hostname }}.crt
 
 - name: Verify signature on server certificate
   command: >
     openssl verify
     -verbose
-    -CAfile {{ ca_ca_dir }}/ca.crt
+    -CAfile {{ ca_client_ca_dir }}/ca.crt
     {{ ca_client_ca_dir }}/{{ inventory_hostname }}-server.crt
 
 - name: Check if instance key is present
@@ -38,21 +38,21 @@
   command: >
     openssl verify
     -verbose
-    -CAfile {{ ca_ca_dir }}/ca.crt
+    -CAfile {{ ca_client_ca_dir }}/ca.crt
     {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.crt
 
 - name: Verify signature on etcd server certificate
   command: >
     openssl verify
     -verbose
-    -CAfile {{ ca_ca_dir }}/ca.crt
+    -CAfile {{ ca_client_ca_dir }}/ca.crt
     {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt
 
 - name: Verify signature on etcd server certificate
   command: >
     openssl verify
     -verbose
-    -CAfile {{ ca_ca_dir }}/ca.crt
+    -CAfile {{ ca_client_ca_dir }}/ca.crt
     {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt
 
 - name: Register SAN of etcd peer certificate
@@ -109,88 +109,57 @@
       not in etcd_san_server_stat.stdout
     - '"127.0.0.1" not in etcd_san_server_stat.stdout'
 
-- name: Get next year
-  set_fact:
-    next_year: "{{ ( ansible_date_time.date.split('-')[0] | int ) +1 }}"
-
-- name: Register notAfter of client certificate
-  shell: >
-    if test -n "$(ps -p $$ | grep bash)"; then set -o pipefail; fi;
+- name: Check if notAfter of client certificate is within {{ valid_days }} days
+  command: >
     openssl x509
     -noout
-    -dates
+    -checkend {{ valid_days * 24 * 60 * 60 - max_test_duration_seconds }}
     -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}.crt
-    | grep notAfter
-  register: client_crt_stat
 
-- name: Fail if notAfter of client certificate is not next year
-  fail:
-    msg: "Failed: notAfter of client certificate is not next year"
-  when: next_year | string not in client_crt_stat.stdout
-
-- name: Register notAfter of server certificate
-  shell: >
-    if test -n "$(ps -p $$ | grep bash)"; then set -o pipefail; fi;
+- name: Check if notAfter of server certificate is within {{ valid_days }} days
+  command: >
     openssl x509
     -noout
-    -dates
+    -checkend {{ valid_days * 24 * 60 * 60 - max_test_duration_seconds }}
     -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}-server.crt
-    | grep notAfter
-  register: server_crt_stat
 
-- name: Fail if notAfter of server certificate is not next year
-  fail:
-    msg: "Failed: notAfter of server certificate is not next year"
-  when: next_year | string not in server_crt_stat.stdout
-
-- name: Register notAfter of etcd certificate
-  shell: >
-    if test -n "$(ps -p $$ | grep bash)"; then set -o pipefail; fi;
+- name: Check if notAfter of etcd certificate is within {{ valid_days }} days
+  command: >
     openssl x509
     -noout
-    -dates
+    -checkend {{ valid_days * 24 * 60 * 60 - max_test_duration_seconds }}
     -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.crt
-    | grep notAfter
-  register: etcd_crt_stat
 
-- name: Fail if notAfter of etcd certificate is not next year
-  fail:
-    msg: "Failed: notAfter of etcd certificate is not next year"
-  when: next_year | string not in etcd_crt_stat.stdout
-
-- name: Register notAfter of etcd server certificate
-  shell: >
-    if test -n "$(ps -p $$ | grep bash)"; then set -o pipefail; fi;
+- name: Check if notAfter of etcd server certificate is within {{ valid_days }} days
+  command: >
     openssl x509
     -noout
-    -dates
+    -checkend {{ valid_days * 24 * 60 * 60 - max_test_duration_seconds }}
     -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt
-    | grep notAfter
-  register: etcd_server_crt_stat
 
-- name: Fail if notAfter of etcd server certificate is not next year
-  fail:
-    msg: "Failed: notAfter of etcd server certificate isn't next year"
-  when: next_year | string not in etcd_server_crt_stat.stdout
-
-- name: Get year of next decade to check CA
-  set_fact:
-    next_decade: "{{ ( ansible_date_time.date.split('-')[0] | int ) +10 }}"
-
-- name: Register notAfter of CA certificate
-  shell: >
-    if test -n "$(ps -p $$ | grep bash)"; then set -o pipefail; fi;
+- name: Check if notAfter of CA certificate is valid within {{ ca_ca_days }} days
+  command: >
     openssl x509
     -noout
-    -dates
+    -checkend {{ ca_ca_days * 24 * 60 * 60 - max_test_duration_seconds }}
     -in {{ ca_client_ca_dir }}/ca.crt
-    | grep notAfter
-  register: ca_crt_stat
 
-# Caution:
-# Can fail at end or beginning of year, since
-# leap year days can be +- 3
-- name: Fail if notAfter of CA certificate is not next decade
+- name: Register if on certificate change handler has run for initial client certificate
+  stat:
+    path: "{{ ansible_env.HOME }}/{{ inventory_hostname }}.initial_certificate"
+  register: initial_handler_file
+
+- name: Fail if initial file of on certificate change handler does not exist
   fail:
-    msg: "Failed because notAfter of CA certificate is not next decade"
-  when: next_decade | string not in ca_crt_stat.stdout
+    msg: "Failed because on certificate change handler hasn't created initial file"
+  when: not initial_handler_file.stat.exists
+
+- name: Register if on certificate change handler has run for renewed client certificate
+  stat:
+    path: "{{ ansible_env.HOME }}/{{ inventory_hostname }}.renewed_certificate"
+  register: renewed_handler_file
+
+- name: Fail if renewed file of on certificate change handler does not exist
+  fail:
+    msg: "Failed because on certificate change handler hasn't created renewed file"
+  when: not renewed_handler_file.stat.exists

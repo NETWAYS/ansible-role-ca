@@ -4,6 +4,8 @@
   vars:
     ca_ca_host: ca_default
     ca_ca_password: ChangeMe
+    # for CA server separate CA and cert client directories allow to trigger notify action on client certificate change
+    ca_client_ca_dir: /opt/certs
     ca_logstash: true
     ca_etcd: true
     ca_etcd_group: molecule
@@ -37,5 +39,12 @@
       vars:
         ca_ca_signing_key_algorithm: Ed25519
         ca_ca_dir: /opt/ca-ed25519
-        ca_client_ca_dir: /opt/ca-ed25519
+        ca_client_ca_dir: /opt/certs-ed25519
         ca_localdir: /tmp/ca-ed25519
+
+  handlers:
+    # runs once for both CAs for each notified host
+    - name: "ansible-role-ca : on certificate change"
+      file:
+        path: "{{ ansible_env.HOME }}/{{ inventory_hostname }}.initial_certificate"
+        state: touch
