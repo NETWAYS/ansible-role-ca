@@ -1,62 +1,67 @@
 - name: Verify signature on certificate
-  command: >
+  ansible.builtin.command: >
     openssl verify
     -verbose
     -CAfile {{ ca_client_ca_dir }}/ca.crt
     {{ ca_client_ca_dir }}/{{ inventory_hostname }}.crt
+  changed_when: false
 
 - name: Verify signature on server certificate
-  command: >
+  ansible.builtin.command: >
     openssl verify
     -verbose
     -CAfile {{ ca_client_ca_dir }}/ca.crt
     {{ ca_client_ca_dir }}/{{ inventory_hostname }}-server.crt
+  changed_when: false
 
 - name: Check if instance key is present
-  stat:
+  ansible.builtin.stat:
     path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
   register: instance_key_stat
 
 - name: Fail if instance key is missing
-  fail:
+  ansible.builtin.fail:
     msg: "Instance key is missing"
   when:
     - not instance_key_stat.stat.exists | bool
 
 - name: Check if Logstash key is present
-  stat:
+  ansible.builtin.stat:
     path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
   register: logstash_key_stat
 
 - name: Fail if Logstash key is missing
-  fail:
+  ansible.builtin.fail:
     msg: "Logstash key is missing"
   when:
     - not logstash_key_stat.stat.exists | bool
 
 - name: Verify signature on etcd peer certificate
-  command: >
+  ansible.builtin.command: >
     openssl verify
     -verbose
     -CAfile {{ ca_client_ca_dir }}/ca.crt
     {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.crt
+  changed_when: false
 
 - name: Verify signature on etcd server certificate
-  command: >
+  ansible.builtin.command: >
     openssl verify
     -verbose
     -CAfile {{ ca_client_ca_dir }}/ca.crt
     {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt
+  changed_when: false
 
 - name: Verify signature on etcd server certificate
-  command: >
+  ansible.builtin.command: >
     openssl verify
     -verbose
     -CAfile {{ ca_client_ca_dir }}/ca.crt
     {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt
+  changed_when: false
 
 - name: Register SAN of etcd peer certificate
-  command: >
+  ansible.builtin.command: >
     openssl x509
     -text -noout
     -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.crt
@@ -72,9 +77,10 @@
     no_sigdump,
     no_aux"
   register: etcd_san_peer_stat
+  changed_when: false
 
 - name: Register SAN of etcd server certificate
-  command: >
+  ansible.builtin.command: >
     openssl x509
     -text
     -noout
@@ -91,9 +97,10 @@
     no_sigdump,
     no_aux"
   register: etcd_san_server_stat
+  changed_when: false
 
 - name: Fail if SAN of etcd peer certificate is missing IP addresses
-  fail:
+  ansible.builtin.fail:
     msg: "Default IPv4 address in etcd peer certifcate are missing"
   when:
     - hostvars['ca_default_client']['ansible_default_ipv4']['address']
@@ -101,7 +108,7 @@
     - '"127.0.0.1" not in etcd_san_peer_stat.stdout'
 
 - name: Fail if SAN of etcd server certificate is missing IP addresses
-  fail:
+  ansible.builtin.fail:
     msg: "Default IPv4 address in etcd server certifcate are missing"
   when:
     - hostvars['ca_default_client']['ansible_default_ipv4']['address']

@@ -76,10 +76,10 @@ It's possible to register handlers to run actions on certificate change. For exa
 
 The following handler names are available for registration:
 
-* `ansible-role-ca : on certificate change`: runs on client certificate change
-* `ansible-role-ca : on server certificate change`: runs on server certificate change
-* `ansible-role-ca : on etcd certificate change`: runs on etcd certificate change
-* `ansible-role-ca : on etcd server certificate change`: runs on etcd server certificate change
+* `Ansible-role-ca : on certificate change`: runs on client certificate change
+* `Ansible-role-ca : on server certificate change`: runs on server certificate change
+* `Ansible-role-ca : on etcd certificate change`: runs on etcd certificate change
+* `Ansible-role-ca : on etcd server certificate change`: runs on etcd server certificate change
 
 
 ## Example Playbook ##
@@ -88,7 +88,7 @@ The following handler names are available for registration:
       roles:
         - ca
       handlers:
-        - name: "ansible-role-ca : on certificate change"
+        - name: "Ansible-role-ca : on certificate change"
           ansible.builtin.systemd_service:
             name: my_tls_service
             state: reloaded

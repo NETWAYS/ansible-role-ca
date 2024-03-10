@@ -118,7 +118,7 @@
     owner: "{{ ca_client_ca_dir_owner }}"
     group: "{{ ca_client_ca_dir_group }}"
     mode: "{{ ca_client_ca_dir_mode }}"
-  notify: "ansible-role-ca : on certificate change"
+  notify: "Ansible-role-ca : on certificate change"
 
 - name: Fetch CA certificate
   ansible.builtin.fetch:
@@ -201,7 +201,7 @@
         owner: "{{ ca_client_ca_dir_owner }}"
         group: "{{ ca_client_ca_dir_group }}"
         mode: "{{ ca_client_ca_dir_mode }}"
-      notify: "ansible-role-ca : on server certificate change"
+      notify: "Ansible-role-ca : on server certificate change"
 
     - name: Handle Logstash compatible key
       when: ca_logstash | bool
@@ -253,12 +253,8 @@
       ansible.builtin.set_fact:
         ca_san_etcd: >-
           {{ ca_san }},
-          IP:127.0.0.1,
-          {%- for host in groups[ca_etcd_group] -%}
-            IP:{{ hostvars[host]['ansible_default_ipv4']['address'] }}
-            {%- if not loop.last -%}
-              ,
-            {%- endif -%}
+          IP:127.0.0.1,{%- for host in groups[ca_etcd_group] -%}
+          IP:{{ hostvars[host]['ansible_default_ipv4']['address'] }}{%- if not loop.last -%},{%- endif -%}
           {%- endfor -%}
       when:
         - ca_etcd | bool
@@ -322,7 +318,7 @@
         owner: "{{ ca_client_ca_dir_owner }}"
         group: "{{ ca_client_ca_dir_group }}"
         mode: "{{ ca_client_ca_dir_mode }}"
-      notify: "ansible-role-ca : on etcd certificate change"
+      notify: "Ansible-role-ca : on etcd certificate change"
 
 ### etcd server certificate ###
 
@@ -388,4 +384,4 @@
         owner: "{{ ca_client_ca_dir_owner }}"
         group: "{{ ca_client_ca_dir_group }}"
         mode: "{{ ca_client_ca_dir_mode }}"
-      notify: "ansible-role-ca : on etcd server certificate change"
+      notify: "Ansible-role-ca : on etcd server certificate change"

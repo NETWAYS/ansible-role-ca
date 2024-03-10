@@ -17,8 +17,8 @@
     ca_valid_time: +365d
     ca_renew: true
   roles:
-    - name: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
-    - name: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+    - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+    - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
       vars:
         ca_ca_signing_key_algorithm: Ed25519
         ca_ca_dir: /opt/ca-ed25519
@@ -27,7 +27,8 @@
 
   handlers:
     # runs once for both CAs for each notified host
-    - name: "ansible-role-ca : on certificate change"
-      file:
+    - name: "Ansible-role-ca : on certificate change"
+      ansible.builtin.file:
         path: "{{ ansible_env.HOME }}/{{ inventory_hostname }}.renewed_certificate"
         state: touch
+        mode: 0600

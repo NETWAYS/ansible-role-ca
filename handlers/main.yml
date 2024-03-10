@@ -1,11 +1,11 @@
-- name: "ansible-role-ca : on certificate change"
-  meta: noop
+- name: "Ansible-role-ca : on certificate change"
+  ansible.builtin.meta: noop
 
-- name: "ansible-role-ca : on server certificate change"
-  meta: noop
+- name: "Ansible-role-ca : on server certificate change"
+  ansible.builtin.meta: noop
 
-- name: "ansible-role-ca : on etcd certificate change"
-  meta: noop
+- name: "Ansible-role-ca : on etcd certificate change"
+  ansible.builtin.meta: noop
 
-- name: "ansible-role-ca : on etcd server certificate change"
-  meta: noop
+- name: "Ansible-role-ca : on etcd server certificate change"
+  ansible.builtin.meta: noop

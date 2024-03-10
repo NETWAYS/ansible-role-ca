@@ -12,8 +12,8 @@
     ca_etcd: true
     ca_etcd_group: molecule
   roles:
-    - name: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
-    - name: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+    - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+    - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
       vars:
         ca_ca_signing_key_algorithm: Ed25519
         ca_ca_dir: /opt/ca-ed25519
