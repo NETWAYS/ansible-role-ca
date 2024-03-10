@@ -116,6 +116,7 @@
     owner: "{{ ca_client_ca_dir_owner }}"
     group: "{{ ca_client_ca_dir_group }}"
     mode: "{{ ca_client_ca_dir_mode }}"
+  notify: "ansible-role-ca : on certificate change"
 
 - name: Fetch CA certificate
   ansible.builtin.fetch:
@@ -197,6 +198,7 @@
         owner: "{{ ca_client_ca_dir_owner }}"
         group: "{{ ca_client_ca_dir_group }}"
         mode: "{{ ca_client_ca_dir_mode }}"
+      notify: "ansible-role-ca : on server certificate change"
 
     - name: Handle Logstash compatible key
       when: ca_logstash | bool
@@ -317,6 +319,7 @@
         owner: "{{ ca_client_ca_dir_owner }}"
         group: "{{ ca_client_ca_dir_group }}"
         mode: "{{ ca_client_ca_dir_mode }}"
+      notify: "ansible-role-ca : on etcd certificate change"
 
 ### etcd server certificate ###
 
@@ -382,3 +385,4 @@
         owner: "{{ ca_client_ca_dir_owner }}"
         group: "{{ ca_client_ca_dir_group }}"
         mode: "{{ ca_client_ca_dir_mode }}"
+      notify: "ansible-role-ca : on etcd server certificate change"
