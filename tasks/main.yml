@@ -15,6 +15,7 @@
     mode: 0700
     state: directory
   delegate_to: "{{ ca_ca_host }}"
+  run_once: true
 
 - name: Ensure local directory on Ansible host exists
   ansible.builtin.file:
@@ -23,6 +24,7 @@
     mode: 0700
   become: "{{ ca_local_become }}"
   delegate_to: localhost
+  run_once: true
 
 - name: Install openssl
   ansible.builtin.package:
@@ -124,6 +126,7 @@
     dest: "{{ ca_localdir }}/ca.crt"
     flat: true
   delegate_to: "{{ ca_ca_host }}"
+  run_once: true
 
 - name: Push CA certificate to client
   ansible.builtin.copy:
@@ -167,7 +170,7 @@
     - name: Check if server certificate has to be renewed
       ansible.builtin.import_tasks: renew.yml
       vars:
-        crt_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-server.crt"
+        crt_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-server.crt"
       when: ca_renew | bool
 
     - name: (Re)sign server CSR with CA key
@@ -288,7 +291,7 @@
     - name: Check if etcd peer certificate has to be renewed
       ansible.builtin.import_tasks: renew.yml
       vars:
-        crt_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd.crt"
+        crt_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.crt"
       when: ca_renew | bool
 
     - name: (Re)sign CSR with CA key
@@ -354,7 +357,7 @@
     - name: Check if etcd server certificate has to be renewed
       ansible.builtin.import_tasks: renew.yml
       vars:
-        crt_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt"
+        crt_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt"
       when: ca_renew | bool
 
     - name: (Re)sign CSR with CA key
