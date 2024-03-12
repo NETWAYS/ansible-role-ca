@@ -38,13 +38,6 @@
   ansible.builtin.import_tasks: ca.yml
   when: ca_ca_host == inventory_hostname
 
-- name: Set ca_san to alternative names or (hostname, FQDN, and inventory hostname)
-  ansible.builtin.set_fact:
-    ca_san: >-
-      DNS:{{ ca_altname_1 }},
-      DNS:{{ ca_altname_2 }},
-      DNS:{{ ca_altname_3 }}
-
 ### client certificate ###
 
 - name: Create key
@@ -66,7 +59,7 @@
     country_name: "{{ ca_country | default(omit, true) }}"
     organization_name: "{{ ca_organization | default(omit, true) }}"
     common_name: "{{ ca_common_name }}"
-    subject_alt_name: "{{ ca_san | regex_replace(' ', '') }}"
+    subject_alt_name: "{{ ca_subject_alternative_name | default(omit, true) }}"
     extended_key_usage: "{{ extended_key_usage | default(omit, true) }}"
 
 - name: Pull CSR
@@ -149,7 +142,7 @@
         country_name: "{{ ca_country | default(omit, true) }}"
         organization_name: "{{ ca_organization | default(omit, true) }}"
         common_name: "{{ ca_common_name }}"
-        subject_alt_name: "{{ ca_san | regex_replace(' ', '') }}"
+        subject_alt_name: "{{ ca_subject_alternative_name | default(omit, true) }}"
         extended_key_usage: "{{ extended_key_usage | default(omit, true) }}"
 
     - name: Pull server CSR
@@ -252,7 +245,7 @@
     - name: Add IP addresses for etcd to ca_san_etcd
       ansible.builtin.set_fact:
         ca_san_etcd: >-
-          {{ ca_san }},
+          {{ ca_subject_alternative_name }},
           IP:127.0.0.1,{%- for host in groups[ca_etcd_group] -%}
           IP:{{ hostvars[host]['ansible_default_ipv4']['address'] }}{%- if not loop.last -%},{%- endif -%}
           {%- endfor -%}

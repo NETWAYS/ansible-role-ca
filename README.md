@@ -41,7 +41,10 @@ You need to have the Python library `cryptography` in version `>1.2.3` available
 * `ca_organizationalunit`: Setting for certificates (omitted by default)
 * `ca_common_name`: CN for certificates (default: `{{ inventory_hostname }}`)
 * `ca_email`: E-Mail address for certificates (omitted by default)
-* `ca_altname_1`: First alt name (default: `{{ ansible_fqdn }}`)
+* `ca_subject_alternative_name`: Value for certificate `subjectAltName` field (default: `DNS:{{ ca_altname_1 }},DNS:{{ ca_altname_2 }},DNS:{{ ca_altname_3}}`, omitted if all `ca_altnameX` varaibles are `null`)
+* `ca_altname_1`: First default alt name (default: `{{ ansible_hostname }}`). Omitted when set to `null`.
+* `ca_altname_2`: Second default alt name (default: `{{ ansible_fqdn }}`). Omitted when set to `null`.
+* `ca_altname_3`: Third default alt name (default: `{{ inventory_hostname }}`). Omitted when set to `null`.
 * `ca_ca_signing_key_algorithm`: CA key generation algorithm (default: `RSA`)
 * `ca_ca_keylength`: CA keylength (default: `2048`)
 * `ca_server_cert`: Create server certificate as well (default: `true`)
