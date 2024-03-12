@@ -96,8 +96,8 @@
   ansible.builtin.command:
     cmd: >
       openssl req
-      -x509
       -new
+      -x509
       -key {{ ca_ca_dir }}/ca.key
       -passin stdin
       -sha256
