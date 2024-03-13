@@ -3,8 +3,8 @@
   ansible.builtin.template:
     src: ca.conf.j2
     dest: "{{ ca_ca_dir }}/ca.conf"
-    owner: root
-    group: root
+    owner: "{{ ca_ca_dir_owner }}"
+    group: "{{ ca_ca_dir_group }}"
     mode: 0600
 
 - name: Check if CA key is already created
