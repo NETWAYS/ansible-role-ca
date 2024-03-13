@@ -23,41 +23,38 @@
     name: openssl
   when: ca_manage_openssl | bool
 
-- name: Check OpenSSL version
-  ansible.builtin.import_tasks: openssl_detect.yml
-
 - name: Set up ca
   ansible.builtin.import_tasks: ca.yml
   when: ca_ca_host == inventory_hostname
 
-### client certificate ###
+### certificate ###
 
-- name: Create client certificate
+- name: Create certificate
   when: ca_client_cert | bool
   block:
-    - name: Ensure CA directory exists on clients
+    - name: Ensure CA cert directory exists
       ansible.builtin.file:
-        path: "{{ ca_client_ca_dir }}"
-        owner: "{{ ca_client_ca_dir_owner }}"
-        group: "{{ ca_client_ca_dir_group }}"
-        mode: "{{ ca_client_ca_dir_mode }}"
+        path: "{{ ca_certs_dir }}"
+        owner: "{{ ca_certs_dir_owner }}"
+        group: "{{ ca_certs_dir_group }}"
+        mode: "{{ ca_certs_dir_mode }}"
         state: directory
 
     - name: Create key
       community.crypto.openssl_privatekey:
-        path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
+        path: "{{ ca_certs_dir }}/{{ inventory_hostname }}.key"
         passphrase: "{{ ca_keypassphrase | default(omit, true) }}"
         cipher: "{{ ca_openssl_cipher | default(omit, true) }}"
-        owner: "{{ ca_client_ca_dir_owner }}"
-        group: "{{ ca_client_ca_dir_group }}"
-        mode: "{{ ca_client_ca_dir_mode }}"
+        owner: "{{ ca_certs_dir_owner }}"
+        group: "{{ ca_certs_dir_group }}"
+        mode: "{{ ca_certs_dir_mode }}"
         type: "{{ ca_client_key_algorithm }}"
       register: key
 
     - name: Create CSR
       community.crypto.openssl_csr:
-        path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.csr"
-        privatekey_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
+        path: "{{ ca_certs_dir }}/{{ inventory_hostname }}.csr"
+        privatekey_path: "{{ ca_certs_dir }}/{{ inventory_hostname }}.key"
         privatekey_passphrase: "{{ ca_keypassphrase | default(omit, true) }}"
         country_name: "{{ ca_country | default(omit, true) }}"
         organization_name: "{{ ca_organization | default(omit, true) }}"
@@ -67,7 +64,7 @@
 
     - name: Pull CSR
       ansible.builtin.fetch:
-        src: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.csr"
+        src: "{{ ca_certs_dir }}/{{ inventory_hostname }}.csr"
         dest: "{{ ca_localdir }}/{{ inventory_hostname }}.csr"
         flat: true
 
@@ -83,7 +80,7 @@
     - name: Check if client certificate has to be renewed
       ansible.builtin.import_tasks: renew.yml
       vars:
-        crt_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.crt"
+        crt_path: "{{ ca_certs_dir }}/{{ inventory_hostname }}.crt"
       when: ca_renew | bool
 
     - name: (Re)sign CSR with CA key
@@ -110,10 +107,10 @@
     - name: Push certificate to client
       ansible.builtin.copy:
         src: "{{ ca_localdir }}/{{ inventory_hostname }}.crt"
-        dest: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.crt"
-        owner: "{{ ca_client_ca_dir_owner }}"
-        group: "{{ ca_client_ca_dir_group }}"
-        mode: "{{ ca_client_ca_dir_mode }}"
+        dest: "{{ ca_certs_dir }}/{{ inventory_hostname }}.crt"
+        owner: "{{ ca_certs_dir_owner }}"
+        group: "{{ ca_certs_dir_group }}"
+        mode: "{{ ca_certs_dir_mode }}"
       notify: "Ansible-role-ca : on certificate change"
 
     - name: Fetch CA certificate
@@ -124,13 +121,13 @@
       delegate_to: "{{ ca_ca_host }}"
       run_once: true
 
-    - name: Push CA certificate to client
+    - name: Push CA certificate
       ansible.builtin.copy:
         src: "{{ ca_localdir }}/ca.crt"
-        dest: "{{ ca_client_ca_dir }}/ca.crt"
-        owner: "{{ ca_client_ca_dir_owner }}"
-        group: "{{ ca_client_ca_dir_group }}"
-        mode: "{{ ca_client_ca_dir_mode }}"
+        dest: "{{ ca_certs_dir }}/ca.crt"
+        owner: "{{ ca_certs_dir_owner }}"
+        group: "{{ ca_certs_dir_group }}"
+        mode: "{{ ca_certs_dir_mode }}"
 
 ### server certificate ###
 
@@ -139,8 +136,8 @@
   block:
     - name: Create server CSR
       community.crypto.openssl_csr:
-        path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-server.csr"
-        privatekey_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
+        path: "{{ ca_certs_dir }}/{{ inventory_hostname }}-server.csr"
+        privatekey_path: "{{ ca_certs_dir }}/{{ inventory_hostname }}.key"
         privatekey_passphrase: "{{ ca_keypassphrase | default(omit, true) }}"
         country_name: "{{ ca_country | default(omit, true) }}"
         organization_name: "{{ ca_organization | default(omit, true) }}"
@@ -150,7 +147,7 @@
 
     - name: Pull server CSR
       ansible.builtin.fetch:
-        src: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-server.csr"
+        src: "{{ ca_certs_dir }}/{{ inventory_hostname }}-server.csr"
         dest: "{{ ca_localdir }}/{{ inventory_hostname }}-server.csr"
         flat: true
 
@@ -166,7 +163,7 @@
     - name: Check if server certificate has to be renewed
       ansible.builtin.import_tasks: renew.yml
       vars:
-        crt_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-server.crt"
+        crt_path: "{{ ca_certs_dir }}/{{ inventory_hostname }}-server.crt"
       when: ca_renew | bool
 
     - name: (Re)sign server CSR with CA key
@@ -193,10 +190,10 @@
     - name: Push server certificate to client
       ansible.builtin.copy:
         src: "{{ ca_localdir }}/{{ inventory_hostname }}-server.crt"
-        dest: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-server.crt"
-        owner: "{{ ca_client_ca_dir_owner }}"
-        group: "{{ ca_client_ca_dir_group }}"
-        mode: "{{ ca_client_ca_dir_mode }}"
+        dest: "{{ ca_certs_dir }}/{{ inventory_hostname }}-server.crt"
+        owner: "{{ ca_certs_dir_owner }}"
+        group: "{{ ca_certs_dir_group }}"
+        mode: "{{ ca_certs_dir_mode }}"
       notify: "Ansible-role-ca : on server certificate change"
 
     - name: Handle Logstash compatible key
@@ -204,14 +201,14 @@
       block:
         - name: Check if Logstash key is present
           ansible.builtin.stat:
-            path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
+            path: "{{ ca_certs_dir }}/{{ inventory_hostname }}-pkcs8.key"
           register: key_stat
 
         - name: Move old Logstash key if common key was replaced
           ansible.builtin.command: >
             mv
-            {{ ca_client_ca_dir }}/{{ inventory_hostname }}-pkcs8.key
-            {{ ca_client_ca_dir }}/\
+            {{ ca_certs_dir }}/{{ inventory_hostname }}-pkcs8.key
+            {{ ca_certs_dir }}/\
             {{ inventory_hostname }}-pkcs8.key.\
             {{ ansible_date_time.iso8601 }}
           changed_when: false
@@ -222,22 +219,21 @@
         - name: Create Logstash compatible key
           ansible.builtin.command: >
             openssl pkcs8
-            -inform PEM
-            -outform PEM
-            -nocrypt
+            -in {{ ca_certs_dir }}/{{ inventory_hostname }}.key
             -topk8
             -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}.key
             -passin pass:{{ ca_keypassphrase | default(omit, true) }}
             {% if ca_ls7_workaround | bool %}-v1 {{ ca_ls7_workaround_cipher }}{% endif %}
-            -out {{ ca_client_ca_dir }}/{{ inventory_hostname }}-pkcs8.key
+            -out {{ ca_certs_dir }}/{{ inventory_hostname }}-pkcs8.key
+            -passout pass:{{ ca_keypassphrase | default(omit, true) }}
           args:
-            creates: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
+            creates: "{{ ca_certs_dir }}/{{ inventory_hostname }}-pkcs8.key"
 
         - name: Set permissions on Logstash key
           ansible.builtin.file:
-            path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
-            owner: "{{ ca_client_ca_dir_owner }}"
-            group: "{{ ca_client_ca_dir_group }}"
+            path: "{{ ca_certs_dir }}/{{ inventory_hostname }}-pkcs8.key"
+            owner: "{{ ca_certs_dir_owner }}"
+            group: "{{ ca_certs_dir_group }}"
             mode: 0600
 
 ### etcd peer certificate ###
@@ -257,8 +253,8 @@
 
     - name: Create CSR
       community.crypto.openssl_csr:
-        path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.csr"
-        privatekey_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
+        path: "{{ ca_certs_dir }}/{{ inventory_hostname }}-etcd.csr"
+        privatekey_path: "{{ ca_certs_dir }}/{{ inventory_hostname }}.key"
         country_name: "{{ ca_country | default(omit, true) }}"
         organization_name: "{{ ca_organization | default(omit, true) }}"
         common_name: "{{ ca_common_name }}"
@@ -267,7 +263,7 @@
 
     - name: Pull CSR
       ansible.builtin.fetch:
-        src: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.csr"
+        src: "{{ ca_certs_dir }}/{{ inventory_hostname }}-etcd.csr"
         dest: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd.csr"
         flat: true
 
@@ -283,7 +279,7 @@
     - name: Check if etcd peer certificate has to be renewed
       ansible.builtin.import_tasks: renew.yml
       vars:
-        crt_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.crt"
+        crt_path: "{{ ca_certs_dir }}/{{ inventory_hostname }}-etcd.crt"
       when: ca_renew | bool
 
     - name: (Re)sign CSR with CA key
@@ -307,13 +303,13 @@
         flat: true
       delegate_to: "{{ ca_ca_host }}"
 
-    - name: Push certificate to client
+    - name: Push certificate to etcd peer
       ansible.builtin.copy:
         src: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd.crt"
-        dest: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.crt"
-        owner: "{{ ca_client_ca_dir_owner }}"
-        group: "{{ ca_client_ca_dir_group }}"
-        mode: "{{ ca_client_ca_dir_mode }}"
+        dest: "{{ ca_certs_dir }}/{{ inventory_hostname }}-etcd.crt"
+        owner: "{{ ca_certs_dir_owner }}"
+        group: "{{ ca_certs_dir_group }}"
+        mode: "{{ ca_certs_dir_mode }}"
       notify: "Ansible-role-ca : on etcd certificate change"
 
 ### etcd server certificate ###
@@ -323,8 +319,8 @@
   block:
     - name: Create CSR
       community.crypto.openssl_csr:
-        path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.csr"
-        privatekey_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
+        path: "{{ ca_certs_dir }}/{{ inventory_hostname }}-etcd-server.csr"
+        privatekey_path: "{{ ca_certs_dir }}/{{ inventory_hostname }}.key"
         country_name: "{{ ca_country | default(omit, true) }}"
         organization_name: "{{ ca_organization | default(omit, true) }}"
         common_name: "{{ ca_common_name }}"
@@ -333,7 +329,7 @@
 
     - name: Pull CSR
       ansible.builtin.fetch:
-        src: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.csr"
+        src: "{{ ca_certs_dir }}/{{ inventory_hostname }}-etcd-server.csr"
         dest: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd-server.csr"
         flat: true
 
@@ -349,7 +345,7 @@
     - name: Check if etcd server certificate has to be renewed
       ansible.builtin.import_tasks: renew.yml
       vars:
-        crt_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt"
+        crt_path: "{{ ca_certs_dir }}/{{ inventory_hostname }}-etcd-server.crt"
       when: ca_renew | bool
 
     - name: (Re)sign CSR with CA key
@@ -376,8 +372,8 @@
     - name: Push certificate to client
       ansible.builtin.copy:
         src: "{{ ca_localdir }}/{{ inventory_hostname }}-etcd-server.crt"
-        dest: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt"
-        owner: "{{ ca_client_ca_dir_owner }}"
-        group: "{{ ca_client_ca_dir_group }}"
-        mode: "{{ ca_client_ca_dir_mode }}"
+        dest: "{{ ca_certs_dir }}/{{ inventory_hostname }}-etcd-server.crt"
+        owner: "{{ ca_certs_dir_owner }}"
+        group: "{{ ca_certs_dir_group }}"
+        mode: "{{ ca_certs_dir_mode }}"
       notify: "Ansible-role-ca : on etcd server certificate change"

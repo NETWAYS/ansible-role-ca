@@ -2,21 +2,21 @@
   ansible.builtin.command: >
     openssl verify
     -verbose
-    -CAfile {{ ca_client_ca_dir }}/ca.crt
-    {{ ca_client_ca_dir }}/{{ inventory_hostname }}.crt
+    -CAfile {{ ca_certs_dir }}/ca.crt
+    {{ ca_certs_dir }}/{{ inventory_hostname }}.crt
   changed_when: false
 
 - name: Verify signature on server certificate
   ansible.builtin.command: >
     openssl verify
     -verbose
-    -CAfile {{ ca_client_ca_dir }}/ca.crt
-    {{ ca_client_ca_dir }}/{{ inventory_hostname }}-server.crt
+    -CAfile {{ ca_certs_dir }}/ca.crt
+    {{ ca_certs_dir }}/{{ inventory_hostname }}-server.crt
   changed_when: false
 
 - name: Check if instance key is present
   ansible.builtin.stat:
-    path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
+    path: "{{ ca_certs_dir }}/{{ inventory_hostname }}.key"
   register: instance_key_stat
 
 - name: Fail if instance key is missing
@@ -27,7 +27,7 @@
 
 - name: Check if Logstash key is present
   ansible.builtin.stat:
-    path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}-pkcs8.key"
+    path: "{{ ca_certs_dir }}/{{ inventory_hostname }}-pkcs8.key"
   register: logstash_key_stat
 
 - name: Fail if Logstash key is missing
@@ -40,31 +40,31 @@
   ansible.builtin.command: >
     openssl verify
     -verbose
-    -CAfile {{ ca_client_ca_dir }}/ca.crt
-    {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.crt
+    -CAfile {{ ca_certs_dir }}/ca.crt
+    {{ ca_certs_dir }}/{{ inventory_hostname }}-etcd.crt
   changed_when: false
 
 - name: Verify signature on etcd server certificate
   ansible.builtin.command: >
     openssl verify
     -verbose
-    -CAfile {{ ca_client_ca_dir }}/ca.crt
-    {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt
+    -CAfile {{ ca_certs_dir }}/ca.crt
+    {{ ca_certs_dir }}/{{ inventory_hostname }}-etcd-server.crt
   changed_when: false
 
 - name: Verify signature on etcd server certificate
   ansible.builtin.command: >
     openssl verify
     -verbose
-    -CAfile {{ ca_client_ca_dir }}/ca.crt
-    {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt
+    -CAfile {{ ca_certs_dir }}/ca.crt
+    {{ ca_certs_dir }}/{{ inventory_hostname }}-etcd-server.crt
   changed_when: false
 
 - name: Register SAN of etcd peer certificate
   ansible.builtin.command: >
     openssl x509
     -text -noout
-    -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd.crt
+    -in {{ ca_certs_dir }}/{{ inventory_hostname }}-etcd.crt
     -certopt "
     no_subject,
     no_header,
@@ -84,7 +84,7 @@
     openssl x509
     -text
     -noout
-    -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}-etcd-server.crt
+    -in {{ ca_certs_dir }}/{{ inventory_hostname }}-etcd-server.crt
     -certopt "
     no_subject,
     no_header,

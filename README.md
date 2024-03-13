@@ -51,12 +51,12 @@ You need to have the Python library `cryptography` in version `>1.2.3` available
 * `ca_logstash`: Create Logstash compatible certificate as well. Needs `ca_server_cert` to be set. (default: `false`)
 * `ca_etcd`: Create additional etcd compatible certificates. Requires `ca_etcd_group` to be defined. (default: `false`)
 * `ca_etcd_group`: Needs to be set to the group name of etcd nodes and will add the default IPv4 address of each node to the certificates. 127.0.0.1 will also be added by the role to the SAN for loopback purposes.(default: `undefined`)
-* `ca_keypassphrase`: Password for the client key, default not defined
+* `ca_keypassphrase`: Password for the leaf certificate key, default not defined
 * `ca_openssl_cipher`: Cipher to use for key creation, default not defined
-* `ca_client_ca_dir`: Directory to place CA and certificates on the clients (default: `/opt/ca`)
-* `ca_client_ca_dir_owner`: User to own the certificate directory on the clients (default: `root`)
-* `ca_client_ca_dir_group`: Group to own the certificate directory on the clients (default: `root`)
-* `ca_client_ca_dir_mode`: Permissions of the certificate directory on the clients (default: `0700`)
+* `ca_certs_dir`: Directory to place CA and certificates on the clients (default: `/opt/ca`)
+* `ca_certs_dir_owner`: User to own the certificate directory on the clients (default: `root`)
+* `ca_certs_dir_group`: Group to own the certificate directory on the clients (default: `root`)
+* `ca_certs_dir_mode`: Permissions of the certificate directory on the clients (default: `0700`)
 * `ca_client_key_algorithm`: Client key generation algorithm (default: `{{ ca_ca_signing_key_algorithm }}`)
 * `ca_renew`: Renew certificates if they expire within `ca_check_valid_time` timeframe (default: `false`)
 * `ca_valid_time`: Valid time of new created certificates (default: `+365d`)

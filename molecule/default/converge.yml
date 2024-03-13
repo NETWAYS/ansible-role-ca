@@ -19,5 +19,5 @@
       vars:
         ca_ca_signing_key_algorithm: Ed25519
         ca_ca_dir: /opt/ca-ed25519
-        ca_client_ca_dir: /opt/ca-ed25519
+        ca_certs_dir: /opt/ca-ed25519
         ca_localdir: /tmp/ca-ed25519

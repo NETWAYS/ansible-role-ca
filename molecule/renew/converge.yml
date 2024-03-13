@@ -9,7 +9,7 @@
     ca_ca_host: ca_default
     ca_ca_password: ChangeMe
     # for CA server separate CA and cert client directories allow to trigger notify action on client certificate change
-    ca_client_ca_dir: /opt/certs
+    ca_certs_dir: /opt/certs
     ca_client_cert: true
     ca_server_cert: true
     ca_logstash: true
@@ -25,7 +25,7 @@
       vars:
         ca_ca_signing_key_algorithm: Ed25519
         ca_ca_dir: /opt/ca-ed25519
-        ca_client_ca_dir: /opt/certs-ed25519
+        ca_certs_dir: /opt/certs-ed25519
         ca_localdir: /tmp/ca-ed25519
 
   handlers:
