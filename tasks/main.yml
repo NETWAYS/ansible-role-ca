@@ -30,7 +30,7 @@
 ### certificate ###
 
 - name: Create certificate
-  when: ca_client_cert | bool
+  when: ca_cert | bool
   block:
     - name: Ensure CA cert directory exists
       ansible.builtin.file:

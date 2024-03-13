@@ -14,7 +14,7 @@ ca_ca_host: localhost
 ca_ca_signing_key_algorithm: RSA
 ca_ca_signing_key_params: ""
 
-ca_client_cert: "{{ ca_ca_host != inventory_hostname }}"
+ca_cert: "{{ inventory_hostname != ca_ca_host }}"
 ca_server_cert: false
 ca_logstash: false
 ca_etcd: false

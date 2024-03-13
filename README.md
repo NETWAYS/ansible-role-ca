@@ -47,7 +47,8 @@ You need to have the Python library `cryptography` in version `>1.2.3` available
 * `ca_altname_3`: Third default alt name (default: `{{ inventory_hostname }}`). Omitted when set to `null`.
 * `ca_ca_signing_key_algorithm`: CA key generation algorithm (default: `RSA`)
 * `ca_ca_keylength`: CA keylength (default: `2048`)
-* `ca_server_cert`: Create server certificate as well (default: `true`)
+* `ca_cert`: Create certificate (default skips CA host: `{{ inventory_hostname != ca_ca_host }}`)
+* `ca_server_cert`: Create server certificate as well (default: `false`)
 * `ca_logstash`: Create Logstash compatible certificate as well. Needs `ca_server_cert` to be set. (default: `false`)
 * `ca_etcd`: Create additional etcd compatible certificates. Requires `ca_etcd_group` to be defined. (default: `false`)
 * `ca_etcd_group`: Needs to be set to the group name of etcd nodes and will add the default IPv4 address of each node to the certificates. 127.0.0.1 will also be added by the role to the SAN for loopback purposes.(default: `undefined`)
