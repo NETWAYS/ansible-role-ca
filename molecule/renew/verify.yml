@@ -5,6 +5,8 @@
     ca_ca_password: ChangeMe
     ca_ca_days: 3650
     valid_days: 5
+    ca_client_cert: true
+    ca_server_cert: true
     # allowed delta between certificate generation and notAfter validation
     max_test_duration_seconds: 900
   tasks:

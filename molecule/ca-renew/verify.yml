@@ -3,6 +3,8 @@
   hosts: all
   vars:
     ca_ca_password: ChangeMe
+    ca_client_cert: true
+    ca_server_cert: true
     valid_days: 365
     ca_ca_days: 5
     # allowed delta between certificate generation and notAfter validation

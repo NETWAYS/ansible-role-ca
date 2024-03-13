@@ -10,6 +10,8 @@
     ca_ca_password: ChangeMe
     # for CA server separate CA and cert client directories allow to trigger notify action on client certificate change
     ca_client_ca_dir: /opt/certs
+    ca_client_cert: true
+    ca_server_cert: true
     ca_logstash: true
     ca_etcd: true
     ca_etcd_group: molecule

@@ -3,6 +3,8 @@
   hosts: all
   vars:
     ca_ca_password: ChangeMe
+    ca_client_cert: true
+    ca_server_cert: true
   tasks:
     - name: Verify RSA
       ansible.builtin.include_tasks: tasks/verify_tasks.yml
