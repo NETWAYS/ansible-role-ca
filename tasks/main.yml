@@ -47,7 +47,7 @@
         cipher: "{{ ca_openssl_cipher | default(omit, true) }}"
         owner: "{{ ca_certs_dir_owner }}"
         group: "{{ ca_certs_dir_group }}"
-        mode: "{{ ca_certs_dir_mode }}"
+        mode: 0600
         type: "{{ ca_key_algorithm }}"
       register: key
 
@@ -61,6 +61,9 @@
         common_name: "{{ ca_common_name }}"
         subject_alt_name: "{{ ca_subject_alternative_name | default(omit, true) }}"
         extended_key_usage: "{{ (ca_extended_key_usage | join(',')) if ca_extended_key_usage is defined else omit }}"
+        owner: "{{ ca_certs_dir_owner }}"
+        group: "{{ ca_certs_dir_group }}"
+        mode: 0600
 
     - name: Pull CSR
       ansible.builtin.fetch:
@@ -110,7 +113,7 @@
         dest: "{{ ca_certs_dir }}/{{ inventory_hostname }}.crt"
         owner: "{{ ca_certs_dir_owner }}"
         group: "{{ ca_certs_dir_group }}"
-        mode: "{{ ca_certs_dir_mode }}"
+        mode: 0600
       notify: "Ansible-role-ca : on certificate change"
 
     - name: Fetch CA certificate
@@ -127,7 +130,7 @@
         dest: "{{ ca_certs_dir }}/ca.crt"
         owner: "{{ ca_certs_dir_owner }}"
         group: "{{ ca_certs_dir_group }}"
-        mode: "{{ ca_certs_dir_mode }}"
+        mode: "0600"
 
 ### server certificate ###
 
@@ -193,7 +196,7 @@
         dest: "{{ ca_certs_dir }}/{{ inventory_hostname }}-server.crt"
         owner: "{{ ca_certs_dir_owner }}"
         group: "{{ ca_certs_dir_group }}"
-        mode: "{{ ca_certs_dir_mode }}"
+        mode: "0600"
       notify: "Ansible-role-ca : on server certificate change"
 
     - name: Handle Logstash compatible key
@@ -309,7 +312,7 @@
         dest: "{{ ca_certs_dir }}/{{ inventory_hostname }}-etcd.crt"
         owner: "{{ ca_certs_dir_owner }}"
         group: "{{ ca_certs_dir_group }}"
-        mode: "{{ ca_certs_dir_mode }}"
+        mode: "0600"
       notify: "Ansible-role-ca : on etcd certificate change"
 
 ### etcd server certificate ###
@@ -375,5 +378,5 @@
         dest: "{{ ca_certs_dir }}/{{ inventory_hostname }}-etcd-server.crt"
         owner: "{{ ca_certs_dir_owner }}"
         group: "{{ ca_certs_dir_group }}"
-        mode: "{{ ca_certs_dir_mode }}"
+        mode: "0600"
       notify: "Ansible-role-ca : on etcd server certificate change"
