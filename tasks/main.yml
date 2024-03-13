@@ -60,7 +60,7 @@
         organization_name: "{{ ca_organization | default(omit, true) }}"
         common_name: "{{ ca_common_name }}"
         subject_alt_name: "{{ ca_subject_alternative_name | default(omit, true) }}"
-        extended_key_usage: "{{ ca_extended_key_usage| default(omit, true) }}"
+        extended_key_usage: "{{ (ca_extended_key_usage | to_json) if ca_extended_key_usage is defined else omit }}"
 
     - name: Pull CSR
       ansible.builtin.fetch:
@@ -143,7 +143,7 @@
         organization_name: "{{ ca_organization | default(omit, true) }}"
         common_name: "{{ ca_common_name }}"
         subject_alt_name: "{{ ca_subject_alternative_name | default(omit, true) }}"
-        extended_key_usage: "{{ ca_extended_key_usage| default(omit, true) }}"
+        extended_key_usage: "{{ (ca_extended_key_usage | to_json) if ca_extended_key_usage is defined else omit }}"
 
     - name: Pull server CSR
       ansible.builtin.fetch:
@@ -259,7 +259,7 @@
         organization_name: "{{ ca_organization | default(omit, true) }}"
         common_name: "{{ ca_common_name }}"
         subject_alt_name: "{{ ca_san_etcd | regex_replace(' ', '') }}"
-        extended_key_usage: "{{ ca_extended_key_usage| default(omit, true) }}"
+        extended_key_usage: "{{ (ca_extended_key_usage | to_json) if ca_extended_key_usage is defined else omit }}"
 
     - name: Pull CSR
       ansible.builtin.fetch:
@@ -325,7 +325,7 @@
         organization_name: "{{ ca_organization | default(omit, true) }}"
         common_name: "{{ ca_common_name }}"
         subject_alt_name: "{{ ca_san_etcd | regex_replace(' ', '') }}"
-        extended_key_usage: "{{ ca_extended_key_usage| default(omit, true) }}"
+        extended_key_usage: "{{ (ca_extended_key_usage | to_json) if ca_extended_key_usage is defined else omit }}"
 
     - name: Pull CSR
       ansible.builtin.fetch:
