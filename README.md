@@ -49,6 +49,17 @@ You need to have the Python library `cryptography` in version `>1.2.3` available
 * `ca_valid_time`: Valid time of new created certificates (default: `+365d`)
 * `ca_check_valid_time`: Timeframe to check if certificates will expire (default: `+2w`)
 
+### Workarounds ###
+
+Sometimes a very special combination of tools and versions requires a workaround that may only work in certain environments. We implement these usually with variables to turn them on or off. These are almost always temporary so we don't invest a lot in documentation. If you know, you need a certain setting, then activate the variable. If not, please leave it off because these workarounds usually have negative side effects.
+
+These workarounds usually don't get their own test scenarios in molecule. They will be tested in local test systems and left as they are.
+
+All of these have the default value `false`.
+
+* `ca_ls7_workaround`: Enable pinning key parameters for a Logstash compatible key. These settings make sure the key works with a certain combination of OpenSSL and Logstash. Symptom: Logstash logs that a valid PKCS8 key is invalid.
+* `ca_ls7_workaround_cipher`: The cipher to use for the workaround (default: `PBE-SHA1-RC4-128`)
+
 ## Example Playbook ##
 
     - hosts: all
