@@ -1,5 +1,5 @@
 ansible
 ansible-lint
 molecule
-requests-2.32.3
+requests==2.31.0
 molecule-plugins[docker]
