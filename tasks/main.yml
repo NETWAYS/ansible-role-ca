@@ -82,7 +82,7 @@
 - name: Check if client certificate has to be renewed
   ansible.builtin.import_tasks: renew.yml
   vars:
-    crt_path: "{{ ca_ca_dir }}/{{ inventory_hostname }}.crt"
+    crt_path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.crt"
   when: ca_renew | bool
 
 - name: (Re)sign CSR with CA key
