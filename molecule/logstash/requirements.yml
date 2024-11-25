@@ -1,0 +1,8 @@
+---
+roles:
+collections:
+  - community.crypto
+    #- name: netways.elasticstack
+    #  source: https://github.com/NETWAYS/ansible-collection-elasticstack.git
+    #  scm: git
+    #  version: main
