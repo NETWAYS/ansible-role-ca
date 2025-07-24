@@ -17,4 +17,4 @@
   tasks:
     - name: "Include CA role"
       include_role:
-        name: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}"
+        name: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
