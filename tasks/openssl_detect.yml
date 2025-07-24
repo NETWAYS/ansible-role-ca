@@ -1,5 +1,12 @@
 ---
 
+###
+# The following code checks for the OpenSSL version being used
+# When signing a CA key, OpenSSL 3 needs paramaters older versions don't
+# understand.
+# The `version` filter is unkown to Jinja2 so we need a fact that helps
+# with changing templates accordingly
+
 - name: Get OpenSSL version
   command: openssl version
   register: openssl_version_raw
