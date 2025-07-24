@@ -13,12 +13,14 @@ organizationalUnitName          = {{ ca_organizationalunit }}
 commonName                      = {{ ca_common_name }}
 emailAddress                    = {{ ca_email }}
 
+{% if openssl_version_3 | bool %}
 [v3_ca]
 basicConstraints = critical,CA:true,pathlen:0
 keyUsage = critical,keyCertSign,cRLSign
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid,issuer
 
+{% endif %}
 [v3_req]
 keyUsage = keyEncipherment, dataEncipherment
 extendedKeyUsage = serverAuth

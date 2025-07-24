@@ -1,5 +1,7 @@
 ---
 
+
+
 - name: Ensure CA directory exists on clients
   ansible.builtin.file:
     path: "{{ ca_client_ca_dir }}"
@@ -29,6 +31,9 @@
   ansible.builtin.package:
     name: openssl
   when: ca_manage_openssl | bool
+
+- name: Check OpenSSL version
+  ansible.builtin.import_tasks: openssl_detect.yml
 
 - name: Set up ca
   ansible.builtin.import_tasks: ca.yml

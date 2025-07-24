@@ -88,7 +88,7 @@
     -key {{ ca_ca_dir }}/ca.key
     -passin pass:{{ ca_ca_password }}
     -sha256
-    -extensions v3_ca
+    {{ openssl_ca_ext_opts }}
     -days {{ ca_ca_days }}
     -out {{ ca_ca_dir }}/ca.crt
     -config {{ ca_ca_dir }}/ca.conf

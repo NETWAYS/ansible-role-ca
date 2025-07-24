@@ -1,0 +1,25 @@
+---
+
+- name: Get OpenSSL version
+  command: openssl version
+  register: openssl_version_raw
+  changed_when: false
+
+- name: Extract OpenSSL version string
+  set_fact:
+    openssl_version: "{{ openssl_version_raw.stdout.split(' ')[1] }}"
+
+- name: Set OpenSSL extension parameters (OpenSSL ≥ 3.0)
+  set_fact:
+    openssl_ca_ext_opts: "-extensions v3_ca"
+  when: openssl_version is version('3.0', '>=')
+
+- name: Set OpenSSL extension parameters (OpenSSL < 3.0)
+  set_fact:
+    openssl_ca_ext_opts: ""
+  when: openssl_version is version('3.0', '<')
+
+- name: Set Variable for Jinja2 templates
+  set_fact:
+    openssl_version_3: true
+  when: openssl_version is version('3.0', '>=')
