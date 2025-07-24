@@ -13,6 +13,12 @@ organizationalUnitName          = {{ ca_organizationalunit }}
 commonName                      = {{ ca_common_name }}
 emailAddress                    = {{ ca_email }}
 
+[v3_ca]
+basicConstraints = critical,CA:true,pathlen:0
+keyUsage = critical,keyCertSign,cRLSign
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer
+
 [v3_req]
 keyUsage = keyEncipherment, dataEncipherment
 extendedKeyUsage = serverAuth
