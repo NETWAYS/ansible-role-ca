@@ -26,6 +26,9 @@ provisioner:
   name: ansible
 verifier:
   name: ansible
+  config_options:
+    defaults:
+      roles_path: "$MOLECULE_PROJECT_DIRECTORY/.."
 lint: |
   set -e
   yamllint .
