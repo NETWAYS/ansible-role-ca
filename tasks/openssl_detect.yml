@@ -18,12 +18,12 @@
 
 - name: Set OpenSSL extension parameters (OpenSSL ≥ 3.0)
   set_fact:
-    openssl_ca_ext_opts: "-extensions v3_ca"
+    _ca_openssl_ca_ext_opts: "-extensions v3_ca"
   when: _ca_openssl_version is version('3.0', '>=')
 
 - name: Set OpenSSL extension parameters (OpenSSL < 3.0)
   set_fact:
-    openssl_ca_ext_opts: ""
+    _ca_openssl_ca_ext_opts: ""
   when: _ca_openssl_version is version('3.0', '<')
 
 - name: Set Variable for Jinja2 templates
