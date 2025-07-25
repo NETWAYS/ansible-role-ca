@@ -19,5 +19,6 @@ galaxy_info:
     - system
     - ca
     - openssl
-dependencies:
-  - collection: community.crypto
+dependencies: []
+# You can't have collections as dependency, but you still need this:
+#  - collection: community.crypto
