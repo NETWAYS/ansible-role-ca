@@ -1,7 +1,5 @@
 ---
 
-
-
 - name: Ensure CA directory exists on clients
   ansible.builtin.file:
     path: "{{ ca_client_ca_dir }}"

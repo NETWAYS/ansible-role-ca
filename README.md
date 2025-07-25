@@ -10,6 +10,12 @@ The intended use is to create certificates you can use for connecting clients to
 
 Some files are copied to the host you're running Ansible on.
 
+This role is tested with:
+
+* Rockylinux 8
+* Rockylinux 9
+* Ubuntu 22.04
+
 ## Requirements ##
 
 You need to have the Python library `cryptography` in version `>1.2.3` available. `PyOpenSSL` might also work, but is deprecated. Please note that different versions might have different requirements which ciphers to use. So watch your Playbook output and be ready to change `ca_openssl_cipher` if needed.

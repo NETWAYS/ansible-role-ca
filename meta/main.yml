@@ -10,10 +10,14 @@ galaxy_info:
   platforms:
     - name: EL
       version:
-        - 7
         - 8
+        - 9
+    - name: Ubuntu
+      version:
+        - 22.04
   galaxy_tags:
     - system
     - ca
     - openssl
-dependencies: []
+dependencies:
+  - collection: community.crypto
