@@ -15,6 +15,8 @@ This role is tested with:
 * Rockylinux 8
 * Rockylinux 9
 * Ubuntu 22.04
+* Ubuntu 24.04
+* Debian 12
 
 ## Requirements ##
 
