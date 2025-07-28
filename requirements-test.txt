@@ -1,4 +1,5 @@
-ansible
+# Pin to ansible < 2.17 because package handling tasks fail on Rockylinux 8 with 2.17+
+ansible-core<2.17
 ansible-lint
 molecule
 requests==2.31.0

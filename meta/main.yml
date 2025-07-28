@@ -10,10 +10,15 @@ galaxy_info:
   platforms:
     - name: EL
       version:
-        - 7
         - 8
+        - 9
+    - name: Ubuntu
+      version:
+        - 22.04
   galaxy_tags:
     - system
     - ca
     - openssl
 dependencies: []
+# You can't have collections as dependency, but you still need this:
+#  - collection: community.crypto

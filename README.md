@@ -8,9 +8,13 @@ A simple role to create a CA to create certificates and deploy them to hosts.
 
 The intended use is to create certificates you can use for connecting clients to main systems. As there are several tools that require keys and certificates with different options set, the role should be able to create them, too. These more specialised keys and certificate must not replace the default ones. See [Contributing](#contributing) below for details. The idea is to run the role once on all hosts in the infrastructure to create all certificates and keys.
 
-The current version is only tested with CentOS 7 and Rocky 8.
-
 Some files are copied to the host you're running Ansible on.
+
+This role is tested with:
+
+* Rockylinux 8
+* Rockylinux 9
+* Ubuntu 22.04
 
 ## Requirements ##
 
