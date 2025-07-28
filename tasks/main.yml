@@ -30,6 +30,9 @@
     name: openssl
   when: ca_manage_openssl | bool
 
+- name: Check OpenSSL version
+  ansible.builtin.import_tasks: openssl_detect.yml
+
 - name: Set up ca
   ansible.builtin.import_tasks: ca.yml
   when: ca_ca_host == inventory_hostname
