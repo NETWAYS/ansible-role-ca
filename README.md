@@ -12,8 +12,8 @@ Some files are copied to the host you're running Ansible on.
 
 This role is tested with:
 
-* Rockylinux 8
 * Rockylinux 9
+* Rockylinux 10
 * Ubuntu 22.04
 * Ubuntu 24.04
 * Debian 12
