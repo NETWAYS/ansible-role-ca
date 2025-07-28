@@ -14,8 +14,16 @@ jobs:
 
     strategy:
       matrix:
-        distro: [rockylinux8, rockylinux9, ubuntu2204]
-        scenario: [default, renew, ca-renew]
+        distro:
+          - rockylinux8
+          - rockylinux9
+          - ubuntu2204
+          - ubuntu2404
+          - debian12
+        scenario:
+          - default
+          - renew
+          - ca-renew
     steps:
       - name: Check out code
         uses: actions/checkout@v4
