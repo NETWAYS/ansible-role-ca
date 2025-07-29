@@ -29,15 +29,15 @@ jobs:
         # make sure results dir is created
         run: mkdir -p results-dir
       - name: run kics Scan
-        uses: Checkmarx/kics-github-action@3246fb456a46d1ea8848ae18793c036718b19fe0 # v2.1.5
+        uses: Checkmarx/kics-github-action@cd1f3774406f7818e3f79b77b093fe2ebaaf5c1d #v2.1.12
         with:
           # path: 'roles,plugins'
           path: '.'
-          # fail_on: high
+          fail_on: high
           ignore_on_exit: results
           output_formats: 'json,sarif'
           output_path: results-dir
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@af56b044b5d41c317aef5d19920b3183cb4fbbec # v3
+        uses: github/codeql-action/upload-sarif@5378192d256ef1302a6980fffe5ca04426d43091 #v3.28.21
         with:
           sarif_file: results-dir/results.sarif
