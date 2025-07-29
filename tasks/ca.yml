@@ -4,9 +4,6 @@
   ansible.builtin.template:
     src: ca.conf.j2
     dest: "{{ ca_ca_dir }}/ca.conf"
-    owner: root
-    group: root
-    mode: 0600
 
 - name: Check if CA key is already created
   ansible.builtin.stat:
