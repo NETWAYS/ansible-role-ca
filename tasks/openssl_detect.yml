@@ -8,25 +8,25 @@
 # with changing templates accordingly
 
 - name: Get OpenSSL version
-  command: openssl version
+  ansible.builtin.command: openssl version
   register: _ca_openssl_version_raw
   changed_when: false
 
 - name: Extract OpenSSL version string
-  set_fact:
+  ansible.builtin.set_fact:
     _ca_openssl_version: "{{ _ca_openssl_version_raw.stdout.split(' ')[1] }}"
 
 - name: Set OpenSSL extension parameters (OpenSSL ≥ 3.0)
-  set_fact:
+  ansible.builtin.set_fact:
     _ca_openssl_ca_ext_opts: "-extensions v3_ca"
   when: _ca_openssl_version is version('3.0', '>=')
 
 - name: Set OpenSSL extension parameters (OpenSSL < 3.0)
-  set_fact:
+  ansible.builtin.set_fact:
     _ca_openssl_ca_ext_opts: ""
   when: _ca_openssl_version is version('3.0', '<')
 
 - name: Set Variable for Jinja2 templates
-  set_fact:
+  ansible.builtin.set_fact:
     _ca_ca_openssl_version_3: true
   when: _ca_openssl_version is version('3.0', '>=')
