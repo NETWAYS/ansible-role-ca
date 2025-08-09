@@ -1,31 +1,39 @@
 [req]
 distinguished_name = req_distinguished_name
-req_extensions = v3_req
+req_extensions = v3_req_ca
+x509_extensions = v3_req_ca
 prompt = no
 
 [req_distinguished_name]
+{% if ca_country is defined %}
 countryName                     = {{ ca_country }}
-stateOrProvinceName             = {{ ca_state }}
-localityName                    = {{ ca_locality }}
-postalCode                      = {{ ca_postalcode }}
-organizationName                = {{ ca_organization }}
-organizationalUnitName          = {{ ca_organizationalunit }}
-commonName                      = {{ ca_common_name }}
-emailAddress                    = {{ ca_email }}
-
-{% if _ca_ca_openssl_version_3 | bool %}
-[v3_ca]
-basicConstraints = critical,CA:true,pathlen:0
-keyUsage = critical,keyCertSign,cRLSign
-subjectKeyIdentifier = hash
-authorityKeyIdentifier = keyid,issuer
-
 {% endif %}
-[v3_req]
-keyUsage = keyEncipherment, dataEncipherment
-extendedKeyUsage = serverAuth
-subjectAltName = @alt_names
+{% if ca_state is defined %}
+stateOrProvinceName             = {{ ca_state }}
+{% endif %}
+{% if ca_locality is defined %}
+localityName                    = {{ ca_locality }}
+{% endif %}
+{% if ca_postalcode is defined %}
+postalCode                      = {{ ca_postalcode }}
+{% endif %}
+{% if ca_organization is defined %}
+organizationName                = {{ ca_organization }}
+{% endif %}
+{% if ca_organizationunit is defined %}
+organizationalUnitName          = {{ ca_organizationalunit }}
+{% endif %}
+commonName                      = {{ ca_common_name }}
+{% if ca_email is defined %}
+emailAddress                    = {{ ca_email }}
+{% endif %}
 
-[alt_names]
-DNS.1 = {{ ca_altname_1 }}
-DNS.2 = {{ ca_altname_2 }}
+[v3_req_ca]
+basicConstraints =  critical, CA:true, pathlen:1
+# digitalSignature is needed if CA acts as a OCSP responder
+keyUsage = keyCertSign, cRLSign, digitalSignature
+# To facilitate certification path construction, this extension MUST
+# appear in all conforming CA certificates, that is, all certificates
+# including the basic constraints extension
+# https://www.rfc-editor.org/rfc/rfc5280#section-4.2.1.2
+subjectKeyIdentifier = hash

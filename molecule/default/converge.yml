@@ -7,10 +7,17 @@
   hosts: all
   vars:
     ca_ca_host: ca_default
+    ca_ca_password: ChangeMe
+    ca_cert: true
+    ca_server_cert: true
     ca_logstash: true
     ca_etcd: true
     ca_etcd_group: molecule
-  tasks:
-    - name: "Include CA role"
-      include_role:
-        name: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+  roles:
+    - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+    - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+      vars:
+        ca_ca_signing_key_algorithm: Ed25519
+        ca_ca_dir: /opt/ca-ed25519
+        ca_certs_dir: /opt/ca-ed25519
+        ca_localdir: /tmp/ca-ed25519
