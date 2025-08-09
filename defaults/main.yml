@@ -33,5 +33,3 @@ ca_renew: false
 ca_ca_days: 3650
 ca_valid_time: +365d
 ca_check_valid_time: +2w
-
-_ca_ca_openssl_version_3: false
