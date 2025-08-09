@@ -46,6 +46,7 @@ You need to have the Python library `cryptography` in version `>1.2.3` available
 * `ca_altname_2`: Second default alt name (default: `{{ ansible_fqdn }}`). Omitted when set to `null`.
 * `ca_altname_3`: Third default alt name (default: `{{ inventory_hostname }}`). Omitted when set to `null`.
 * `ca_ca_signing_key_algorithm`: CA key generation algorithm (default: `RSA`)
+* `ca_ca_signing_key_params`: CA key generation command options (empty by default)
 * `ca_ca_keylength`: CA keylength (default: `2048`)
 * `ca_cert`: Create certificate (default skips CA host: `{{ inventory_hostname != ca_ca_host }}`). It's up to an operator to configure the certificate for TLS client or/and TLS server.
 * `ca_extended_key_usage`: Configures certificate `extendedKeyUsage` field. For example, to support both client and server authentication pass `['clientAuth', 'serverAuth']` (default: omitted)

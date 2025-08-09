@@ -49,6 +49,7 @@
       -aes256
       -passout stdin
       -out {{ ca_ca_dir }}/ca.key
+      {{ ca_ca_signing_key_params }}
       {{ ca_ca_keylength }}
     stdin: "{{ ca_ca_password }}"
   args:
