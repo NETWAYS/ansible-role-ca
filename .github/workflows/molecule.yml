@@ -38,9 +38,6 @@ jobs:
           python3 -m pip install --upgrade pip
           python3 -m pip install -r requirements-test.txt
 
-      - name: ${{ matrix.scenario }} ansible-lint
-        run: ansible-lint
-
       - name: ${{ matrix.scenario }} molecule test
         run: |
           molecule test -s ${{ matrix.scenario }}

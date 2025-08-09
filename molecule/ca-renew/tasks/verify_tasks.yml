@@ -157,22 +157,22 @@
     -in {{ ca_certs_dir }}/ca.crt
   changed_when: false
 
-- name: Register if on certificate change handler has run for initial client certificate
+- name: Register if 'on certificate change' handler has run for initial client certificate
   ansible.builtin.stat:
     path: "{{ ansible_env.HOME }}/{{ inventory_hostname }}.initial_certificate"
   register: initial_handler_file
 
-- name: Fail if initial file of on certificate change handler does not exist
+- name: Fail if initial file of 'on certificate change' handler does not exist
   ansible.builtin.fail:
-    msg: "Failed because on certificate change handler hasn't created initial file"
+    msg: "Failed because 'on certificate change' handler hasn't created initial file"
   when: not initial_handler_file.stat.exists
 
-- name: Register if on certificate change handler has run for renewed client certificate
+- name: Register if 'on certificate change' handler has run for renewed client certificate
   ansible.builtin.stat:
     path: "{{ ansible_env.HOME }}/{{ inventory_hostname }}.renewed_certificate"
   register: renewed_handler_file
 
-- name: Fail if renewed file of on certificate change handler does not exist
+- name: Fail if renewed file of 'on certificate change' handler does not exist
   ansible.builtin.fail:
-    msg: "Failed because on certificate change handler hasn't created renewed file"
+    msg: "Failed because 'on certificate change handler' hasn't created renewed file"
   when: not renewed_handler_file.stat.exists
