@@ -21,11 +21,11 @@ jobs:
           python-version: "3.x"
 
       - name: Run ansible-lint
-        uses: ansible/ansible-lint@v25.7.0
+        uses: ansible/ansible-lint@v25.9.0
         with:
           args: "--sarif-file gh-ansible-lint-results.sarif --exclude molecule"
 
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v3.29.5
+        uses: github/codeql-action/upload-sarif@v3.30.5
         with:
           sarif_file: ./gh-ansible-lint-results.sarif
