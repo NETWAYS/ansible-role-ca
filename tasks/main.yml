@@ -104,7 +104,8 @@
         ownca_privatekey_passphrase: "{{ ca_ca_password }}"
         ownca_not_after: "{{ ca_valid_time }}"
         provider: ownca
-        force: "{{ not crt_info.valid_at.check_period | default(omit) or
+        force: 
+          "{{ not crt_info.valid_at.check_period | default(omit) or
           hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
         backup: true
       delegate_to: "{{ ca_ca_host }}"
@@ -179,7 +180,8 @@
         ownca_privatekey_passphrase: "{{ ca_ca_password }}"
         ownca_not_after: "{{ ca_valid_time }}"
         provider: ownca
-        force: "{{ not crt_info.valid_at.check_period | default(omit) or
+        force: 
+          "{{ not crt_info.valid_at.check_period | default(omit) or
           hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
         backup: true
       delegate_to: "{{ ca_ca_host }}"
@@ -295,7 +297,8 @@
         ownca_privatekey_passphrase: "{{ ca_ca_password }}"
         ownca_not_after: "{{ ca_valid_time }}"
         provider: ownca
-        force: "{{ not crt_info.valid_at.check_period | default(omit) or
+        force: 
+          "{{ not crt_info.valid_at.check_period | default(omit) or
           hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
         backup: true
       delegate_to: "{{ ca_ca_host }}"
@@ -361,7 +364,8 @@
         ownca_privatekey_passphrase: "{{ ca_ca_password }}"
         ownca_not_after: "{{ ca_valid_time }}"
         provider: ownca
-        force: "{{ not crt_info.valid_at.check_period | default(omit) or
+        force: 
+          "{{ not crt_info.valid_at.check_period | default(omit) or
           hostvars[ca_ca_host]['ca_ca_renewed'] | default(omit) }}"
         backup: true
       delegate_to: "{{ ca_ca_host }}"
