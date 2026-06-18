@@ -3,35 +3,53 @@
   hosts: all
   vars:
     ca_ca_host: ca_default
+    ca_ca_password: ChangeMe
+    # for CA server separate CA and cert client directories allow to trigger notify action on client certificate change
+    ca_certs_dir: /opt/certs
+    ca_cert: true
+    ca_server_cert: true
     ca_logstash: true
     ca_etcd: true
     ca_etcd_group: molecule
     ca_ca_days: 5
     ca_valid_time: "+14d"
     ca_renew: true
-  tasks:
 
+  pre_tasks:
     - name: Install Python libraries
-      pip:
+      ansible.builtin.pip:
         name: cryptography>= 1.2.3
 
     - name: Install packages for RHEL
-      package:
+      ansible.builtin.package:
         name:
           - iproute
           - NetworkManager
       when: ansible_os_family == "RedHat"
 
     - name: Start NetworkManager
-      service:
+      ansible.builtin.service:
         name: NetworkManager
         state: started
         enabled: yes
       when: ansible_os_family == "RedHat"
 
     - name: Gather facts again to define ansible_default_ipv4
-      setup:
+      ansible.builtin.setup:
 
-    - name: "Include CA role"
-      include_role:
-        name: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+  roles:
+    - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+    - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
+      vars:
+        ca_ca_signing_key_algorithm: Ed25519
+        ca_ca_dir: /opt/ca-ed25519
+        ca_certs_dir: /opt/certs-ed25519
+        ca_localdir: /tmp/ca-ed25519
+
+  handlers:
+    # runs once for both CAs for each notified host
+    - name: "Ansible-role-ca : on certificate change"
+      ansible.builtin.file:
+        path: "{{ ansible_env.HOME }}/{{ inventory_hostname }}.initial_certificate"
+        state: touch
+        mode: 0600
