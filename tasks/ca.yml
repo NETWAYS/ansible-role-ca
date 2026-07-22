@@ -1,5 +1,32 @@
 ---
 
+- name: Install provided CA
+  when: ca_own_ca | bool
+  block:
+
+    - name: Ensure own CA key and certificate are set
+      ansible.builtin.assert:
+        that:
+          - ca_own_ca_key is defined and ca_own_ca_key | length > 0
+          - ca_own_ca_cert is defined and ca_own_ca_cert | length > 0
+        fail_msg: "ca_own_ca is enabled but ca_own_ca_key/ca_own_ca_cert are not set"
+
+    - name: Copy provided CA private key
+      ansible.builtin.copy:
+        src: "{{ ca_own_ca_key }}"
+        dest: "{{ ca_ca_dir }}/ca.key"
+        owner: root
+        group: root
+        mode: 0600
+
+    - name: Copy provided CA certificate
+      ansible.builtin.copy:
+        src: "{{ ca_own_ca_cert }}"
+        dest: "{{ ca_ca_dir }}/ca.crt"
+        owner: root
+        group: root
+        mode: 0644
+
 - name: Place CA configuration file
   ansible.builtin.template:
     src: ca.conf.j2
@@ -7,14 +34,18 @@
     owner: root
     group: root
     mode: 0600
+  when: not ca_own_ca | bool
 
 - name: Check if CA key is already created
   ansible.builtin.stat:
     path: "{{ ca_ca_dir }}/ca.key"
   register: cakey
+  when: not ca_own_ca | bool
 
 - name: Test and prepare key
-  when: cakey.stat.exists
+  when:
+    - not ca_own_ca | bool
+    - cakey.stat.exists
   block:
 
     - name: Test CA key if present
@@ -54,9 +85,12 @@
     {{ ca_ca_keylength }}
   args:
     creates: "{{ ca_ca_dir }}/ca.key"
+  when: not ca_own_ca | bool
 
 - name: Renew CA certificate
-  when: ca_renew | bool
+  when:
+    - ca_renew | bool
+    - not ca_own_ca | bool
   block:
 
     - name: Check if CA certificate has to be renewed
@@ -94,3 +128,4 @@
     -config {{ ca_ca_dir }}/ca.conf
   args:
     creates: "{{ ca_ca_dir }}/ca.crt"
+  when: not ca_own_ca | bool
