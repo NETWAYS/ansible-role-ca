@@ -1,31 +1,29 @@
 ---
-
 ca_manage_openssl: true
 ca_ca_dir: /opt/ca
-ca_client_ca_dir: /opt/ca
-ca_client_ca_dir_owner: root
-ca_client_ca_dir_group: root
-ca_client_ca_dir_mode: 0700
-ca_ca_password: ChangeMe
+ca_ca_dir_owner: root
+ca_ca_dir_group: root
+ca_certs_dir: /opt/ca
+ca_certs_dir_owner: root
+ca_certs_dir_group: root
+ca_certs_dir_mode: 0700
+ca_key_algorithm: "{{ ca_ca_signing_key_algorithm }}"
 ca_localdir: /tmp/ca
 ca_local_become: false
 ca_ca_host: localhost
+ca_ca_signing_key_algorithm: RSA
+ca_ca_signing_key_params: ""
 
-ca_server_cert: true
+ca_cert: "{{ inventory_hostname != ca_ca_host }}"
+ca_server_cert: false
 ca_logstash: false
 ca_etcd: false
 
-ca_country: EX
-ca_state: EX
-ca_locality: EX
-ca_postalcode: 1234
-ca_organization: example
-ca_organizationalunit: example
 ca_common_name: "{{ inventory_hostname }}"
-ca_email: "root@{{ ansible_fqdn }}"
 ca_altname_1: "{{ ansible_hostname }}"
 ca_altname_2: "{{ ansible_fqdn }}"
 ca_altname_3: "{{ inventory_hostname }}"
+ca_subject_alternative_name: "{{ [ca_altname_1, ca_altname_2, ca_altname_3] | reject('none') | map('regex_replace', '^(.*)$', 'DNS:\\1') | join(',') }}"
 ca_ca_keylength: 2048
 
 ca_ls7_workaround: false
@@ -35,5 +33,3 @@ ca_renew: false
 ca_ca_days: 3650
 ca_valid_time: +365d
 ca_check_valid_time: +2w
-
-_ca_ca_openssl_version_3: false

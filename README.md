@@ -26,31 +26,41 @@ You need to have the Python library `cryptography` in version `>1.2.3` available
 
 * `ca_manage_openssl`: Install `openssl` package? (default: `true`)
 * `ca_ca_dir`: Directory to place CA and certificates (default: `/opt/ca`)
+* `ca_ca_dir_owner`: CA directory owner (default: `root`)
+* `ca_ca_dir_group`: CA directory group (default: `root`)
 * `ca_ca_days`: Runtime of the CA certificate (default: `3650`)
-* `ca_ca_password`: Password of CA key (default: `ChangeMe`)
+* `ca_ca_password`: Password of CA key (no default, should be defined by user)
 * `ca_localdir`: Temporary directory on Ansible management host (default: `/tmp/ca`)
 * `ca_local_become`: Use `become` on the Ansible controller. Used for creation of `ca_localdir`. (default: `false`)
 * `ca_ca_host`: Hostname of the CA host (default: `localhost`)
-* `ca_country`: Setting for certificates (default: `EX`)
-* `ca_state`: Setting for certificates (default: `EX`)
-* `ca_locality`: Setting for certificates (default: `EX`)
-* `ca_postalcode`: Setting for certificates (default: `1234`)
-* `ca_organization`: Setting for certificates (default: `example`)
-* `ca_organizationalunit`: Setting for certificates (default: `example`)
+* `ca_country`: Setting for certificates (omitted by default)
+* `ca_state`: Setting for certificates (omitted by default)
+* `ca_locality`: Setting for certificates (omitted by default)
+* `ca_postalcode`: Setting for certificates (omitted by default)
+* `ca_organization`: Setting for certificates (omitted by default)
+* `ca_organizationalunit`: Setting for certificates (omitted by default)
 * `ca_common_name`: CN for certificates (default: `{{ inventory_hostname }}`)
-* `ca_email`: E-Mail address for certificates (default: `root@{{ ansible_fqdn }}`)
-* `ca_altname_1`: First alt name (default: `{{ ansible_fqdn }}`)
+* `ca_email`: E-Mail address for certificates (omitted by default)
+* `ca_subject_alternative_name`: Value for certificate `subjectAltName` field (default: `DNS:{{ ca_altname_1 }},DNS:{{ ca_altname_2 }},DNS:{{ ca_altname_3}}`, omitted if all `ca_altnameX` varaibles are `null`)
+* `ca_altname_1`: First default alt name (default: `{{ ansible_hostname }}`). Omitted when set to `null`.
+* `ca_altname_2`: Second default alt name (default: `{{ ansible_fqdn }}`). Omitted when set to `null`.
+* `ca_altname_3`: Third default alt name (default: `{{ inventory_hostname }}`). Omitted when set to `null`.
+* `ca_ca_signing_key_algorithm`: CA key generation algorithm (default: `RSA`)
+* `ca_ca_signing_key_params`: CA key generation command options (empty by default)
 * `ca_ca_keylength`: CA keylength (default: `2048`)
-* `ca_server_cert`: Create server certificate as well (default: `true`)
+* `ca_cert`: Create certificate (default skips CA host: `{{ inventory_hostname != ca_ca_host }}`). It's up to an operator to configure the certificate for TLS client or/and TLS server.
+* `ca_extended_key_usage`: Configures certificate `extendedKeyUsage` field. For example, to support both client and server authentication pass `['clientAuth', 'serverAuth']` (default: omitted)
+* `ca_server_cert`: Create server certificate as well (default: `false`)
 * `ca_logstash`: Create Logstash compatible certificate as well. Needs `ca_server_cert` to be set. (default: `false`)
 * `ca_etcd`: Create additional etcd compatible certificates. Requires `ca_etcd_group` to be defined. (default: `false`)
 * `ca_etcd_group`: Needs to be set to the group name of etcd nodes and will add the default IPv4 address of each node to the certificates. 127.0.0.1 will also be added by the role to the SAN for loopback purposes.(default: `undefined`)
-* `ca_keypassphrase`: Password for the client key, default not defined
+* `ca_keypassphrase`: Password for the leaf certificate key, default not defined
 * `ca_openssl_cipher`: Cipher to use for key creation, default not defined
-* `ca_client_ca_dir`: Directory to place CA and certificates on the clients (default: `/opt/ca`)
-* `ca_client_ca_dir_owner`: User to own the certificate directory on the clients (default: `root`)
-* `ca_client_ca_dir_group`: Group to own the certificate directory on the clients (default: `root`)
-* `ca_client_ca_dir_mode`: Permissions of the certificate directory on the clients (default: `0700`)
+* `ca_certs_dir`: Directory to place key, CA and leaf certificates on the hosts (default: `/opt/ca`)
+* `ca_certs_dir_owner`: User to own the certificate directory on the hosts (default: `root`)
+* `ca_certs_dir_group`: Group to own the certificate directory on the hosts (default: `root`)
+* `ca_certs_dir_mode`: Permissions of the certificate directory on the hosts (default: `0700`)
+* `ca_key_algorithm`: End-user key generation algorithm (default: `{{ ca_ca_signing_key_algorithm }}`)
 * `ca_renew`: Renew certificates if they expire within `ca_check_valid_time` timeframe (default: `false`)
 * `ca_valid_time`: Valid time of new created certificates (default: `+365d`)
 * `ca_check_valid_time`: Timeframe to check if certificates will expire (default: `+2w`)
@@ -66,11 +76,28 @@ All of these have the default value `false`.
 * `ca_ls7_workaround`: Enable pinning key parameters for a Logstash compatible key. These settings make sure the key works with a certain combination of OpenSSL and Logstash. Symptom: Logstash logs that a valid PKCS8 key is invalid.
 * `ca_ls7_workaround_cipher`: The cipher to use for the workaround (default: `PBE-SHA1-RC4-128`)
 
+## Notification handlers
+
+It's possible to register handlers to run actions on certificate change. For example, to reload service and use the updated certificate.
+
+The following handler names are available for registration:
+
+* `Ansible-role-ca : on certificate change`: runs on certificate change
+* `Ansible-role-ca : on server certificate change`: runs on server certificate change
+* `Ansible-role-ca : on etcd certificate change`: runs on etcd certificate change
+* `Ansible-role-ca : on etcd server certificate change`: runs on etcd server certificate change
+
+
 ## Example Playbook ##
 
     - hosts: all
       roles:
         - ca
+      handlers:
+        - name: "Ansible-role-ca : on certificate change"
+          ansible.builtin.systemd_service:
+            name: my_tls_service
+            state: reloaded
 
 ## Contributing ##
 
