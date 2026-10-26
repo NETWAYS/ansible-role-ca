@@ -16,16 +16,16 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Set up Python 3.
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: "3.x"
 
       - name: Run ansible-lint
-        uses: ansible/ansible-lint@v26.6.0
+        uses: ansible/ansible-lint@v26.9.0
         with:
           args: "--sarif-file gh-ansible-lint-results.sarif --exclude molecule"
 
       - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v4.36.2
+        uses: github/codeql-action/upload-sarif@v4.38.2
         with:
           sarif_file: ./gh-ansible-lint-results.sarif
