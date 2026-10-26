@@ -118,12 +118,16 @@
     group: "{{ ca_client_ca_dir_group }}"
     mode: "{{ ca_client_ca_dir_mode }}"
 
+# run_once: the CA certificate is identical for every host. Fetching it per
+# host to the same flat destination lets parallel runs race on the file and
+# fail with "checksum mismatch", so fetch it exactly once.
 - name: Fetch CA certificate
   ansible.builtin.fetch:
     src: "{{ ca_ca_dir }}/ca.crt"
     dest: "{{ ca_localdir }}/ca.crt"
     flat: true
   delegate_to: "{{ ca_ca_host }}"
+  run_once: true
 
 - name: Push CA certificate to client
   ansible.builtin.copy:
