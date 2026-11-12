@@ -116,3 +116,34 @@
         - hostvars['ca_default_client']['ansible_default_ipv4']['address']
           not in etcd_san_server_stat.stdout
         - '"127.0.0.1" not in etcd_san_server_stat.stdout'
+
+    - name: Register SAN of client and server certificate
+      command: >
+        openssl x509 -noout -ext subjectAltName
+        -in {{ ca_client_ca_dir }}/{{ inventory_hostname }}{{ item }}.crt
+      loop:
+        - ""
+        - "-server"
+      register: san_stat
+      changed_when: false
+
+    # openssl prints an IP entry as "IP Address:192.0.2.10"
+    - name: Fail if an entry of ca_san_extra is missing
+      fail:
+        msg: >-
+          {{ item.1 }} is missing in
+          {{ inventory_hostname }}{{ item.0.item }}.crt
+      loop: "{{ san_stat.results | product(san_extra) | list }}"
+      vars:
+        san_extra: "{{ ca_san_extra | default([]) }}"
+      when: item.1 | regex_replace('^IP:', 'IP Address:') not in item.0.stdout
+
+    - name: Fail if a host without ca_san_extra got the extra names
+      fail:
+        msg: >-
+          {{ inventory_hostname }}{{ item.item }}.crt
+          contains names of ca_san_extra
+      loop: "{{ san_stat.results }}"
+      when:
+        - ca_san_extra is not defined
+        - "'192.0.2.10' in item.stdout or 'lb.example.com' in item.stdout"
