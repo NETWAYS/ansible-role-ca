@@ -44,6 +44,11 @@
       DNS:{{ ansible_fqdn }},
       DNS:{{ inventory_hostname }}
 
+- name: Add ca_san_extra to ca_san
+  ansible.builtin.set_fact:
+    ca_san: "{{ ([ca_san] + ca_san_extra) | join(', ') }}"
+  when: ca_san_extra | length > 0
+
 ### client certificate ###
 
 - name: Create key

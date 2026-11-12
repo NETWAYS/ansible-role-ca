@@ -27,5 +27,11 @@ provisioner:
   config_options:
     defaults:
       roles_path: "$MOLECULE_PROJECT_DIRECTORY/.."
+  inventory:
+    host_vars:
+      ca_default_client:
+        ca_san_extra:
+          - IP:192.0.2.10
+          - DNS:lb.example.com
 verifier:
   name: ansible
