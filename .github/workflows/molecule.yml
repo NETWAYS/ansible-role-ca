@@ -24,6 +24,7 @@ jobs:
           - default
           - renew
           - ca-renew
+          - own-ca
     steps:
       - name: Check out code
         uses: actions/checkout@v7

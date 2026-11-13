@@ -1,0 +1,48 @@
+---
+- name: Generate an own CA on the controller
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    own_ca_dir: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/own-ca"
+    own_ca_password: molecule
+  tasks:
+
+    - name: Ensure own CA directory exists
+      ansible.builtin.file:
+        path: "{{ own_ca_dir }}"
+        state: directory
+        mode: 0700
+
+    - name: Generate own CA key
+      ansible.builtin.command: >
+        openssl genrsa
+        -aes256
+        -passout pass:{{ own_ca_password }}
+        -out {{ own_ca_dir }}/ca.key
+        2048
+      args:
+        creates: "{{ own_ca_dir }}/ca.key"
+
+    - name: Generate own CA certificate
+      ansible.builtin.command: >
+        openssl req
+        -x509
+        -new
+        -key {{ own_ca_dir }}/ca.key
+        -passin pass:{{ own_ca_password }}
+        -sha256
+        -days 3650
+        -subj "/CN=Molecule Own CA"
+        -addext "basicConstraints=critical,CA:TRUE"
+        -out {{ own_ca_dir }}/ca.crt
+      args:
+        creates: "{{ own_ca_dir }}/ca.crt"
+
+- name: Prepare
+  hosts: all
+  tasks:
+
+    - name: Install Python libraries
+      pip:
+        name: cryptography>= 1.2.3

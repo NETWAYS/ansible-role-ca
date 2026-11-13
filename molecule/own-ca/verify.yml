@@ -1,0 +1,50 @@
+---
+
+- name: Verify
+  hosts: all
+  vars:
+    ca_ca_dir: /opt/ca
+    ca_client_ca_dir: /opt/ca
+  tasks:
+
+    - name: Read issuer of the deployed CA certificate
+      command: >
+        openssl x509
+        -in {{ ca_client_ca_dir }}/ca.crt
+        -noout
+        -issuer
+      register: ca_issuer
+      changed_when: false
+
+    - name: Fail if the deployed CA is not the provided own CA
+      fail:
+        msg: "Deployed CA is not the provided own CA, got: {{ ca_issuer.stdout }}"
+      when:
+        - "'Molecule Own CA' not in ca_issuer.stdout"
+
+    - name: Verify signature on certificate
+      command: >
+        openssl verify
+        -verbose
+        -CAfile {{ ca_ca_dir }}/ca.crt
+        {{ ca_client_ca_dir }}/{{ inventory_hostname }}.crt
+      changed_when: false
+
+    - name: Verify signature on server certificate
+      command: >
+        openssl verify
+        -verbose
+        -CAfile {{ ca_ca_dir }}/ca.crt
+        {{ ca_client_ca_dir }}/{{ inventory_hostname }}-server.crt
+      changed_when: false
+
+    - name: Check if instance key is present
+      stat:
+        path: "{{ ca_client_ca_dir }}/{{ inventory_hostname }}.key"
+      register: instance_key_stat
+
+    - name: Fail if instance key is missing
+      fail:
+        msg: "Instance key is missing"
+      when:
+        - not instance_key_stat.stat.exists | bool

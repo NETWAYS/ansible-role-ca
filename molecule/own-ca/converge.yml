@@ -1,0 +1,17 @@
+---
+# The workaround for arbitrarily named role directory is important because the
+# git repo has one name and the role within it another
+# Found at:
+# https://github.com/ansible-community/molecule/issues/1567#issuecomment-436876722
+- name: Converge
+  hosts: all
+  vars:
+    ca_ca_host: ca_default
+    ca_own_ca: true
+    ca_own_ca_key: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/own-ca/ca.key"
+    ca_own_ca_cert: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/own-ca/ca.crt"
+    ca_ca_password: molecule
+  tasks:
+    - name: "Include CA role"
+      include_role:
+        name: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') | basename }}"
