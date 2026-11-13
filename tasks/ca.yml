@@ -29,6 +29,29 @@
         mode: 0644
         backup: true
 
+    - name: Read provided CA private key
+      community.crypto.openssl_privatekey_info:
+        path: "{{ ca_ca_dir }}/ca.key"
+        passphrase: "{{ ca_ca_password }}"
+      register: ca_own_key_info
+      failed_when: false
+
+    - name: Read provided CA certificate
+      community.crypto.x509_certificate_info:
+        path: "{{ ca_ca_dir }}/ca.crt"
+      register: ca_own_cert_info
+
+    - name: Validate the provided CA key and certificate
+      ansible.builtin.assert:
+        that:
+          - ca_own_key_info.can_parse_key | bool
+          - (ca_own_key_info.public_key | default('')) == (ca_own_cert_info.public_key | default(''))
+          - "'CA:TRUE' in (ca_own_cert_info.basic_constraints | default([]))"
+        fail_msg: >-
+          Provided CA is invalid: check that ca_ca_password matches the key,
+          that key and certificate belong together, and that the certificate
+          is a CA certificate (basic_constraints CA:TRUE).
+
 - name: Place CA configuration file
   ansible.builtin.template:
     src: ca.conf.j2
