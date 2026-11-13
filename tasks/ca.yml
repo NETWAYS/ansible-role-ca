@@ -18,6 +18,7 @@
         owner: root
         group: root
         mode: 0600
+        backup: true
 
     - name: Copy provided CA certificate
       ansible.builtin.copy:
@@ -26,6 +27,7 @@
         owner: root
         group: root
         mode: 0644
+        backup: true
 
 - name: Place CA configuration file
   ansible.builtin.template:
