@@ -26,7 +26,7 @@
         dest: "{{ ca_ca_dir }}/ca.crt"
         owner: root
         group: root
-        mode: 0644
+        mode: "{{ ca_client_ca_dir_mode }}"
         backup: true
 
     - name: Read provided CA private key
