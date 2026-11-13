@@ -69,6 +69,14 @@ All of these have the default value `false`.
 * `ca_ls7_workaround`: Enable pinning key parameters for a Logstash compatible key. These settings make sure the key works with a certain combination of OpenSSL and Logstash. Symptom: Logstash logs that a valid PKCS8 key is invalid.
 * `ca_ls7_workaround_cipher`: The cipher to use for the workaround (default: `PBE-SHA1-RC4-128`)
 
+## Bring your own CA ##
+
+With `ca_own_ca: true` the role does not generate a CA. It copies `ca_own_ca_key` and `ca_own_ca_cert` from the control host to `ca_ca_dir` and signs the host certificates with them. After copying, the role checks that `ca_ca_password` can decrypt the key, that key and certificate belong together and that the certificate is a CA (`basic_constraints` has `CA:TRUE`), so a wrong passphrase or a mismatched pair fails right away instead of at the first host certificate.
+
+If you sign with an intermediate CA, put the intermediate first and the root after it in `ca_own_ca_cert`. The signing uses the first certificate in the file (the issuer is the intermediate then), and the clients receive the full chain in `ca.crt`. With only the intermediate in `ca.crt`, `openssl verify` fails with `unable to get issuer certificate`.
+
+Switching to a new CA later works: replace `ca_own_ca_key` and `ca_own_ca_cert` and run the role again. `x509_certificate` signs every host certificate again because the CA changed, so each host gets a new certificate while the host keys stay the same.
+
 ## Example Playbook ##
 
     - hosts: all
