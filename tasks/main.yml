@@ -124,6 +124,7 @@
     dest: "{{ ca_localdir }}/ca.crt"
     flat: true
   delegate_to: "{{ ca_ca_host }}"
+  run_once: true
 
 - name: Push CA certificate to client
   ansible.builtin.copy:

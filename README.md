@@ -41,6 +41,9 @@ You need to have the Python library `cryptography` in version `>1.2.3` available
 * `ca_email`: E-Mail address for certificates (default: `root@{{ ansible_fqdn }}`)
 * `ca_altname_1`: First alt name (default: `{{ ansible_fqdn }}`)
 * `ca_ca_keylength`: CA keylength (default: `2048`)
+* `ca_own_ca`: Use an existing/external CA instead of letting the role generate one. When enabled, `ca_own_ca_key` and `ca_own_ca_cert` are copied to `ca_ca_dir` as `ca.key`/`ca.crt` instead of running the CA key/certificate generation. `ca_ca_password` must still match the passphrase of the provided key, since it's used to sign leaf certificates. The role's own CA renewal (`ca_renew`) does not apply to a provided CA; renewing it is up to the operator. (default: `false`)
+* `ca_own_ca_key`: Path on the Ansible control host to the CA private key to install when `ca_own_ca` is `true`. Consider encrypting it with `ansible-vault`. (no default)
+* `ca_own_ca_cert`: Path on the Ansible control host to the CA certificate to install when `ca_own_ca` is `true`. (no default)
 * `ca_server_cert`: Create server certificate as well (default: `true`)
 * `ca_logstash`: Create Logstash compatible certificate as well. Needs `ca_server_cert` to be set. (default: `false`)
 * `ca_etcd`: Create additional etcd compatible certificates. Requires `ca_etcd_group` to be defined. (default: `false`)
@@ -65,6 +68,14 @@ All of these have the default value `false`.
 
 * `ca_ls7_workaround`: Enable pinning key parameters for a Logstash compatible key. These settings make sure the key works with a certain combination of OpenSSL and Logstash. Symptom: Logstash logs that a valid PKCS8 key is invalid.
 * `ca_ls7_workaround_cipher`: The cipher to use for the workaround (default: `PBE-SHA1-RC4-128`)
+
+## Bring your own CA ##
+
+With `ca_own_ca: true` the role does not generate a CA. It copies `ca_own_ca_key` and `ca_own_ca_cert` from the control host to `ca_ca_dir` and signs the host certificates with them. After copying, the role checks that `ca_ca_password` can decrypt the key, that key and certificate belong together and that the certificate is a CA (`basic_constraints` has `CA:TRUE`), so a wrong passphrase or a mismatched pair fails right away instead of at the first host certificate.
+
+If you sign with an intermediate CA, put the intermediate first and the root after it in `ca_own_ca_cert`. The signing uses the first certificate in the file (the issuer is the intermediate then), and the clients receive the full chain in `ca.crt`. With only the intermediate in `ca.crt`, `openssl verify` fails with `unable to get issuer certificate`.
+
+Switching to a new CA later works: replace `ca_own_ca_key` and `ca_own_ca_cert` and run the role again. `x509_certificate` signs every host certificate again because the CA changed, so each host gets a new certificate while the host keys stay the same.
 
 ## Example Playbook ##
 
